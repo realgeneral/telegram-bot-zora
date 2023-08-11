@@ -1,6 +1,7 @@
 import asyncio
 import random
 import re
+import web3.exceptions as ex3
 
 from web3 import Web3
 from web3.types import Wei
@@ -13,7 +14,7 @@ class Bridger:
     def __init__(self, pk):
         self.pk = pk
 
-    def eth_zora_bridge(self, bridge_amount):
+    async def eth_zora_bridge(self, bridge_amount):
         web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
         logger.info(f"Successfully connected to {rpcs['eth']}")
 
@@ -58,9 +59,10 @@ class Bridger:
                     if bridge_tx_receipt.status == 1:
                         logger.info(f"Successfully bridged: {bridge_amount} wei to Zora")
                         logger.info(f"Transaction: https://etherscan.io/tx/{bridge_tx_hash}")
+                        return "✅"
                     else:
                         logger.error("Something went wrong while bridging")
-                except web3.exceptions.TransactionNotFound as err:
+                except ex3.TransactionNotFound as err:
                     logger.error(f"Something went wrong while bridging: {err}")
                     continue
                 except Exception as err:
@@ -72,12 +74,13 @@ class Bridger:
                 want = int(re.search(r'want (\d+)', err.args[0]['message']).group(1))
                 gas = int(re.search(r'gas (\d+)', err.args[0]['message']).group(1))
                 logger.error(f"Insufficient funds for gas * price + value. Want: {want} Have: {have} Gas: {gas}")
-
+                return "❌ Insufficient funds for gas"
             elif "insufficient funds" in str(err):
                 logger.error(f"Insufficient funds for gas * price + value.")
-
+                return "❌ Insufficient funds for gas"
             else:
                 logger.error(f"Something went wrong: {err}")
+                return "❌ Something went wrong"
 
     @staticmethod
     def get_current_gwei():

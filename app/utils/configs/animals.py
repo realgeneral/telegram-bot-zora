@@ -1,4 +1,4 @@
-tokens = {'flamingo': '$fla', 'worm': '$wor', 'cormorant': '$cor', 'crow': '$cro', 'kingfisher': '$kin',
+animals = {'flamingo': '$fla', 'worm': '$wor', 'cormorant': '$cor', 'crow': '$cro', 'kingfisher': '$kin',
           'chimpanzee': '$chi', 'chamois': '$cha', 'elk': '$elk', 'squid': '$squ', 'clam': '$cla', 'gnu': '$gnu',
           'bear': '$bea', 'jellyfish': '$jel', 'otter': '$ott', 'rat': '$rat', 'albatross': '$alb', 'kangaroo': '$kan',
           'caribou': '$car', 'mantis': '$man', 'bee': '$bee', 'cat': '$cat', 'gerbil': '$ger', 'human': '$hum',
