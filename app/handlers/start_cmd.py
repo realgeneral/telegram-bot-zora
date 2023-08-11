@@ -70,8 +70,8 @@ async def is_subscribe(callback_query: types.CallbackQuery):
     await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)
     if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=callback_query.from_user.id)):
         await UserFollowing.get_private_keys.set()
-        await bot.send_message(callback_query.from_user.id, "👝 *Submit your private key's* \n\n"
-                                                            "_Free version_: up to 10 keys.\n "
+        await bot.send_message(callback_query.from_user.id, "👝 *Submit your private keys* \n\n"
+                                                            "_Free version_: up to 10 keys.\n"
                                                             "_Premium version_: up to 50 keys. \n"
                                                             "For access to the premium version, please contact us. \n\n"
                                                             "_The bot doesn't collect or store your personal data or "
