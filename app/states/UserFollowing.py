@@ -5,5 +5,7 @@ class UserFollowing(StatesGroup):
     start_navigation = State()
     check_subscribe = State()
     get_private_keys = State()
-    wallet_menu = State()
     choose_point = State()
+    wallet_menu = State()
+    new_private = State()
+
