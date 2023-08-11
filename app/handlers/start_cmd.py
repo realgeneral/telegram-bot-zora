@@ -5,6 +5,10 @@ from aiogram.dispatcher import FSMContext
 
 from app.create_bot import dp, bot
 from app.states import UserFollowing
+from app.keyboards import check_sub_menu
+
+CHANNEL_ID = -1001984019900
+NOTSUB_MESSAGE = "Looks like you're not subscribed yet! 🙁 Subscribe now to access all the features"
 
 
 @dp.message_handler(commands=['start'])
@@ -14,7 +18,7 @@ async def start_cmd(message: types.Message):
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard=[buttons], resize_keyboard=True)
 
-    await UserFollowing.start_navigation.set()
+    await UserFollowing.check_subscribe.set()
     await message.answer("Welcome to the <b>Zora Automatization</b> bot! 🤖👋 \n\n"
                          # "📍 Рекомендую ознакомиться с <a href='https://t.me/trioinweb3/13'>гайдом</a> 📍\n\n"
                          "The bot execute:\n",
@@ -44,21 +48,42 @@ async def start_cmd(message: types.Message):
                          reply_markup=reply_markup)
 
 
-@dp.message_handler(Text(equals="🚀 Start"), state=UserFollowing.start_navigation)
-async def request_private_key(message: types.Message):
-    await UserFollowing.get_private_keys.set()
-    await message.answer("👝 *Submit your private key* \n\n"
-                         "_The bot doesn't collect or store your personal data or private keys. "
-                         "Zora bot — fully open source project. \n "
-                         "GitHub: https://github.com/realgeneral/telegram-bot-zora_",
-                         parse_mode=types.ParseMode.MARKDOWN,
-                         reply_markup=ReplyKeyboardRemove())
+def check_sub_channel(chat_member):
+    if chat_member["status"] != "left":
+        return True
+    return False
+
+
+@dp.message_handler(Text(equals="🚀 Start"), state=UserFollowing.check_subscribe)
+async def check_subscribe(message: types.Message):
+
+    await UserFollowing.check_subscribe.set()
+    await message.answer("👋📢 To enjoy the full features of our bot, kindly subscribe to our "
+                         "<a href='https://t.me/trioinweb3'>channel</a> first",
+                         parse_mode=types.ParseMode.HTML,
+                         reply_markup=check_sub_menu)
+
+
+@dp.callback_query_handler(text="is_subscribe", state=UserFollowing.check_subscribe)
+async def is_subscribe(callback_query: types.CallbackQuery):
+    await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)
+    if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=callback_query.from_user.id)):
+        await UserFollowing.get_private_keys.set()
+        await bot.send_message(callback_query.from_user.id, "👝 *Submit your private key's* \n\n"
+                                                            "_The bot doesn't collect or store your personal data or "
+                                                            "private keys. "
+                                                            "Zora bot — fully open source project. \n "
+                                                            "GitHub: https://github.com/realgeneral/telegram-bot-zora_",
+                               parse_mode=types.ParseMode.MARKDOWN,
+                               reply_markup=ReplyKeyboardRemove())
+    else:
+        await bot.send_message(callback_query.from_user.id, NOTSUB_MESSAGE, reply_markup=check_sub_menu)
 
 
 @dp.message_handler(state=UserFollowing.get_private_keys)
 async def private_keys(message: types.Message, state: FSMContext):
-    api_key = message.text.strip()
-    await state.update_data(api_key=api_key)
+    private_keys = message.text.split('\n')
+    await state.update_data(private_keys=private_keys)
 
     buttons = [
         KeyboardButton(text="⬅ Go to menu"),
@@ -66,10 +91,7 @@ async def private_keys(message: types.Message, state: FSMContext):
     reply_markup = ReplyKeyboardMarkup(keyboard=[buttons],
                                        resize_keyboard=True)
 
-    await UserFollowing.wallet_menu.set()
+    await UserFollowing.wallet_menu.set(),
     await message.answer("😌 *Keys saved successfully*",
                          parse_mode=types.ParseMode.MARKDOWN,
                          reply_markup=reply_markup)
-
-
-
