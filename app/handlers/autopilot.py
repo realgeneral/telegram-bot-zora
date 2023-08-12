@@ -16,10 +16,49 @@ from app.utils.Randomiser import Randomiser
 from app.utils.configs.ipfs import imageURI_list_hashes
 
 
-# @dp.message_handler(Text(equals=["⬅ Go to menu"]), state='*')
-# async def go_menu(message: types.Message, state: FSMContext):
-#     await UserFollowing.wallet_menu.set()
-#     await send_menu(message, state)
+@dp.message_handler(Text(equals="💸 Tap 2 earn"), state=UserFollowing.choose_point)
+async def tap_to_earn(message: types.Message):
+    message_response = "### *Activity Progress Section* \n \n" \
+                    "You've entered the activity progression section, which includes the following stages:\n" \
+                    "1. _Bridge_ \n" \
+                    "2. _Contract Creation_ \n" \
+                    "3. _Warming Up_ \n" \
+                    "4. _NFT Minting_ \n\n" \
+                    "The estimated time to complete these activities is around 8 hours on average. \n" \
+                    "Minimum required wallet balance: **ETH()** \n " \
+                    "To interrupt the process, simply press the *Stop* button.\n"
+
+    b1 = KeyboardButton("🛫 Take off")
+    b2 = KeyboardButton("⛔️ Stop ⛔️")
+    b3 = KeyboardButton("⬅ Go to menu")
+
+    buttons = ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons.row(b1, b2).row(b3)
+
+    await UserFollowing.tap_to_earn.set()
+    await message.answer(message_response, parse_mode=types.ParseMode.MARKDOWN,
+                         reply_markup=buttons)
+
+
+@dp.message_handler(Text(equals="⛔️ Stop ⛔️"), state=UserFollowing.tap_to_earn)
+async def stop_earn(message: types.Message, state: FSMContext):
+    message_response = "❗️ Stopping ... \n"
+
+    data = await state.get_data()
+    if "final_statistic" in data:
+        message_response += data.get("final_statistic")
+
+    buttons = [
+        KeyboardButton(text="⬅ Go to menu"),
+    ]
+
+    reply_markup = ReplyKeyboardMarkup(keyboard=[buttons],
+                                       resize_keyboard=True)
+
+    await UserFollowing.wallet_menu.set()
+    await message.answer(message_response,
+                         parse_mode=types.ParseMode.MARKDOWN,
+                         reply_markup=reply_markup)
 
 
 def random_time():
@@ -69,8 +108,8 @@ async def create_contract(minter, name, symbol, description, mintPrice, mintLimi
                               editionSize=editionSize, royaltyBPS=royaltyBPS, imageURI=imageURI)
 
 
-@dp.message_handler(Text(equals="💸 Tap 2 earn"), state=UserFollowing.choose_point)
-async def tap_to_earn(message: types.Message, state: FSMContext):
+@dp.message_handler(Text(equals="🛫 Take off"), state=UserFollowing.tap_to_earn)
+async def start_earn(message: types.Message, state: FSMContext):
     data = await state.get_data()
     private_keys = list(data.get("private_keys"))
     count_private_keys = len(private_keys)
@@ -98,7 +137,7 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         # await asyncio.sleep(random.randint(5, 20))
 
     bridge_statistic = "📊 Statistic \n\n" \
-                       " Bridge \n"
+                       " # Bridge \n"
 
     final_statistic += "\n <u> Bridge </u> \n"
 
@@ -106,13 +145,15 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {bridgers_result_list[i]} \n"
         bridge_statistic += f"{i + 1}. {bridgers_result_list[i]} \n"
 
+    await state.update_data(final_statistic=final_statistic)
+
     ##############################################################################################
 
     sleep_on_0 = random_time()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
-                                text=bridge_statistic + f"Sleeping on {sleep_on_0} sec ...")
-    await asyncio.sleep(60)
+                                text=bridge_statistic + f"\n Sleeping on {sleep_on_0} sec ...")
+    # await asyncio.sleep(60)
 
     ########################################### CONTRACT  ###########################################
     random_names = list(animals.animals.keys())
@@ -153,19 +194,20 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
                                     message_id=wait_message.message_id,
                                     text=f"⏳ Creating ERC721 {contract_counter}/{count_private_keys}")
         contract_counter += 1
-        # await asyncio.sleep( random.randint(7200, 14400)) TODO
+        # await asyncio.sleep(random.randint(7200, 14400)) TODO
 
     for i in range(len(list_of_contract_result)):
         final_statistic += f"{i + 1}. {list_of_contract_result[i]} \n"
         wait_message_text += f"{i + 1}. {list_of_contract_result[i]} \n"
 
+    await state.update_data(final_statistic=final_statistic)
     ##############################################################################################
 
     sleep_on_1 = random_time()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
-                                text=wait_message_text + f"Sleeping on {sleep_on_1} sec ...")
-    await asyncio.sleep(30)
+                                text=wait_message_text + f"\nSleeping on {sleep_on_1} sec ...")
+    # await asyncio.sleep(30)
 
     ########################################### WARM UP  ###########################################
 
@@ -190,6 +232,8 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {warm_up_result_1_list[i]} \n"
         warm_up_statistic += f"{i + 1}. {warm_up_result_1_list[i]} \n"
 
+    await state.update_data(final_statistic=final_statistic)
+
     # 2
     warm_up_statistic += "\n Warm Up #2 \n"
     final_statistic += "\n <u> Warm Up #2 </u> \n"
@@ -208,6 +252,8 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
     for i in range(len(warm_up_result_2_list)):
         final_statistic += f"{i + 1}. {warm_up_result_2_list[i]} \n"
         warm_up_statistic += f"{i + 1}. {warm_up_result_2_list[i]} \n"
+
+    await state.update_data(final_statistic=final_statistic)
 
     # 3
     warm_up_statistic += "\n Warm Up #3 \n"
@@ -228,12 +274,14 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {warm_up_result_3_list[i]} \n"
         warm_up_statistic += f"{i + 1}. {warm_up_result_3_list[i]} \n"
 
+    await state.update_data(final_statistic=final_statistic)
+
     ##############################################################################################
 
     sleep_on_2 = random_time()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
-                                text=warm_up_statistic + f"Sleeping on {sleep_on_2} sec ...")
+                                text=warm_up_statistic + f"\n Sleeping on {sleep_on_2} sec ...")
     # await asyncio.sleep(sleep_on_2)
 
     ########################################### MINTS  ###########################################
@@ -262,7 +310,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_1_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_1_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 2
     mint_statistic += "\n Mint #2 \n"
@@ -283,7 +333,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_2_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_2_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 3
     mint_statistic += "\n Mint #3 \n"
@@ -304,7 +356,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_3_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_3_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 4
     mint_statistic += "\n Mint #4 \n"
@@ -325,7 +379,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_4_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_4_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 5
     mint_statistic += "\n Mint #5 \n"
@@ -346,7 +402,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_5_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_5_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 6
     mint_statistic += "\n Mint #6 \n"
@@ -367,7 +425,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_6_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_6_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 7
     mint_statistic += "\n Mint #7 \n"
@@ -388,7 +448,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_7_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_7_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 8
     mint_statistic += "\n Mint #8 \n"
@@ -409,7 +471,9 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         final_statistic += f"{i + 1}. {mint_8_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_8_result_list[i]} \n"
 
-    await asyncio.sleep(random_time())
+    await state.update_data(final_statistic=final_statistic)
+
+    # await asyncio.sleep(random_time())
 
     # 9
     mint_statistic += "\n Mint #9 \n"
@@ -429,6 +493,8 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
     for i in range(len(mint_9_result_list)):
         final_statistic += f"{i + 1}. {mint_9_result_list[i]} \n"
         mint_statistic += f"{i + 1}. {mint_9_result_list[i]} \n"
+
+    await state.update_data(final_statistic=final_statistic)
 
     buttons = [
         KeyboardButton(text="⬅ Go to menu"),

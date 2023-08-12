@@ -8,4 +8,4 @@ class UserFollowing(StatesGroup):
     choose_point = State()
     wallet_menu = State()
     new_private = State()
-
+    tap_to_earn = State()
