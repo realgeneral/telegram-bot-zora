@@ -18,13 +18,13 @@ class Bridger:
         web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
         logger.info(f"Successfully connected to {rpcs['eth']}")
 
-        wallet_address = web3.eth.account.from_key(self.pk).address
-        wallet_balance = web3.eth.get_balance(wallet_address)
-
-        logger.info(f"Wallet address: {wallet_address}")
-        logger.info(f"Balance in ETH network: {web3.from_wei(wallet_balance, 'ether')}")
-
         try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+
+            logger.info(f"Wallet address: {wallet_address}")
+            logger.info(f"Balance in ETH network: {web3.from_wei(wallet_balance, 'ether')}")
+
             contract = web3.eth.contract(address=Web3.to_checksum_address(contracts["ZoraBridge"]["address"]),
                                          abi=contracts["ZoraBridge"]["abi"])
 
