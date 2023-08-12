@@ -33,8 +33,13 @@ class Estimate:
             return total_cost_eth
         except Exception as err:
             logger.error(f"Error while bridge estimating price: {err}")
+            return None
 
 
     def eth_required(self, bridge_amount):
-        total_amount = self.estimate_bridge(bridge_amount=bridge_amount)
-        print("Eth required: ", total_amount)
+        bridge_fee = self.estimate_bridge(bridge_amount=bridge_amount)
+        if bridge_fee:
+            print("Eth required: ", bridge_fee + bridge_amount)
+            return bridge_fee + bridge_amount
+        else:
+            logger.error("Something went wrong while getting eth required value")
