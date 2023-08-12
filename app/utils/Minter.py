@@ -19,13 +19,13 @@ class Minter:
         web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={'proxies':{'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094", 'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
-        wallet_address = web3.eth.account.from_key(self.pk).address
-        wallet_balance = web3.eth.get_balance(wallet_address)
-
-        logger.info(f"Wallet address: {wallet_address}")
-        logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
-
         try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+
+            logger.info(f"Wallet address: {wallet_address}")
+            logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
+
             contract = web3.eth.contract(address=Web3.to_checksum_address(nft_address), abi=nft_contract_abi)
 
             mint_tx = contract.functions.mint(
@@ -88,13 +88,13 @@ class Minter:
                         'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
-        wallet_address = web3.eth.account.from_key(self.pk).address
-        wallet_balance = web3.eth.get_balance(wallet_address)
-
-        logger.info(f"Wallet address: {wallet_address}")
-        logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
-
         try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+
+            logger.info(f"Wallet address: {wallet_address}")
+            logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
+
             contract = web3.eth.contract(address=Web3.to_checksum_address(nft_contract_address), abi=nft_ZoraCreator_contract_abi)
 
             mint_tx = contract.functions.purchase(
@@ -154,13 +154,13 @@ class Minter:
                         'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
-        wallet_address = web3.eth.account.from_key(self.pk).address
-        wallet_balance = web3.eth.get_balance(wallet_address)
-
-        logger.info(f"Wallet address: {wallet_address}")
-        logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
-
         try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+
+            logger.info(f"Wallet address: {wallet_address}")
+            logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
+
             contract = web3.eth.contract(address=Web3.to_checksum_address("0xA2c2A96A232113Dd4993E8b048EEbc3371AE8d85"), abi=ZoraNFTCreator_contract_abi)
 
             create_tx = contract.functions.createEdition(
@@ -225,13 +225,13 @@ class Minter:
                         'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
-        wallet_address = web3.eth.account.from_key(self.pk).address
-        wallet_balance = web3.eth.get_balance(wallet_address)
-
-        logger.info(f"Wallet address: {wallet_address}")
-        logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
-
         try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+
+            logger.info(f"Wallet address: {wallet_address}")
+            logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
+
             contract = web3.eth.contract(address=Web3.to_checksum_address("0xABCDEFEd93200601e1dFe26D6644758801D732E8"),
                                          abi=JSONExtensionRegistry_contract_abi)
 
@@ -260,6 +260,7 @@ class Minter:
                         return "✅"
                     else:
                         logger.error("Something went wrong while  warming up")
+                        return "❌ Something went wrong"
                 except ex3.TransactionNotFound as err:
                     logger.error(f"Something went wrong while  warming up: {err}")
                     continue
@@ -281,13 +282,13 @@ class Minter:
                         'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
-        wallet_address = web3.eth.account.from_key(self.pk).address
-        wallet_balance = web3.eth.get_balance(wallet_address)
-
-        logger.info(f"Wallet address: {wallet_address}")
-        logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
-
         try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+
+            logger.info(f"Wallet address: {wallet_address}")
+            logger.info(f"Balance in ZORA network: {web3.from_wei(wallet_balance, 'ether')}")
+
             contract = web3.eth.contract(address=Web3.to_checksum_address(nft_collection_address),
                                          abi=nft_ZoraCreator_contract_abi)
 
