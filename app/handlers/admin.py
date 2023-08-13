@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram import types
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.dispatcher.filters import Text
@@ -16,14 +18,16 @@ async def go_admin_menu(message: types.Message):
 
 @dp.message_handler(commands=['admin'], state='*')
 async def send_admin_menu(message: types.Message):
-    if int(message.from_user.id) == 420881832:
+    if int(message.from_user.id) == 420881832 or int(message.from_user.id) == 740574479 or int(message.from_user.id) == 812233995:
         message_response = "# *ADMIN MODE* \n"
 
         b1 = KeyboardButton("Add premium user")
         b2 = KeyboardButton("List premium users")
-        b3 = KeyboardButton("⬅ Go to menu")
+        b3 = KeyboardButton("Today logs")
+        b4 = KeyboardButton("⬅ Go to menu")
         buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-        buttons.row(b1).row(b2).row(b3)
+        buttons.row(b1).row(b2).row(b3).row(b4)
+
         await AdminMode.admin_menu.set()
         await message.answer(message_response, parse_mode=types.ParseMode.MARKDOWN, reply_markup=buttons)
 
@@ -57,3 +61,17 @@ async def send_list_prem_user(message: types.Message):
     for i in range(len(list_of_prem_users)):
         message_response += f"{i+1}. {list_of_prem_users[i]} \n"
     await message.answer(message_response, parse_mode=types.ParseMode.MARKDOWN)
+
+
+@dp.message_handler(Text(equals="Today logs"), state=AdminMode.admin_menu)
+async def get_today_logs(message: types.Message):
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    today_logs = []
+
+    with open("app/logs/logs.log", 'r') as f:
+        for line in f:
+            if line.startswith(today):
+                today_logs.append(line.strip())
+
+    reply_message = "\n".join(today_logs)
+    await message.answer(reply_message[-4000:])
