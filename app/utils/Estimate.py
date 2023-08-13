@@ -35,11 +35,42 @@ class Estimate:
             logger.error(f"Error while bridge estimating price: {err}")
             return None
 
-
     def eth_required(self, bridge_amount):
         bridge_fee = self.estimate_bridge(bridge_amount=bridge_amount)
         if bridge_fee:
-            print("Eth required: ", bridge_fee + bridge_amount)
-            return bridge_fee + bridge_amount
+            return float(bridge_fee) + bridge_amount
         else:
             logger.error("Something went wrong while getting eth required value")
+
+    def get_eth_balance(self):
+        web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+        logger.info(f"Successfully connected to {rpcs['eth']}")
+        try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+            eth_balance = web3.from_wei(wallet_balance, 'ether')
+            return round(eth_balance, 5)
+        except Exception as err:
+            logger.error(f"Error while getting balance: {err}")
+            return "-"
+
+    def get_zora_balance(self):
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={'proxies':{'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094", 'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        logger.info(f"Successfully connected to {rpcs['zora']}")
+        try:
+            wallet_address = web3.eth.account.from_key(self.pk).address
+            wallet_balance = web3.eth.get_balance(wallet_address)
+            eth_balance = web3.from_wei(wallet_balance, 'ether')
+            return round(eth_balance, 5)
+        except Exception as err:
+            logger.error(f"Error while getting balance: {err}")
+            return "-"
+
+    def get_eth_address(self):
+        web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+        logger.info(f"Successfully connected to {rpcs['eth']}")
+        try:
+            return web3.eth.account.from_key(self.pk).address
+        except Exception as err:
+            logger.error(f"Error while getting balance: {err}")
+            return "-"

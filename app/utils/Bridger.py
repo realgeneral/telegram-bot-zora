@@ -30,17 +30,19 @@ class Bridger:
 
             bridge_tx = contract.functions.depositTransaction(
                 wallet_address,
-                bridge_amount,
+                web3.to_wei(bridge_amount, "ether"),
                 100000,
                 False,
                 b''
             ).build_transaction({
                 'from': wallet_address,
-                'value': bridge_amount,
-                'gas': round(contract.functions.depositTransaction(wallet_address, bridge_amount, 100000, False,
-                                                                   b'').estimate_gas(
-                    {'from': wallet_address, 'value': bridge_amount,
-                     'nonce': web3.eth.get_transaction_count(wallet_address)}) * 1.15),
+                'value': web3.to_wei(bridge_amount, "ether"),
+                'gas': round(
+                    contract.functions.depositTransaction(wallet_address, web3.to_wei(bridge_amount, "ether"), 100000,
+                                                          False,
+                                                          b'').estimate_gas(
+                        {'from': wallet_address, 'value': web3.to_wei(bridge_amount, "ether"),
+                         'nonce': web3.eth.get_transaction_count(wallet_address)}) * 1.15),
                 'nonce': web3.eth.get_transaction_count(wallet_address)
             }
             )
@@ -105,7 +107,4 @@ class Bridger:
         formatted_number = float(formatted_string.format(random_number))
         logger.info(f"Random amount: {formatted_number}")
 
-
-        bridge_amount = Web3.to_wei(float(formatted_number), 'ether')
-
-        return bridge_amount
+        return formatted_number
