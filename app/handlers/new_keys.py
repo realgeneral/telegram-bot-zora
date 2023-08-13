@@ -6,6 +6,7 @@ from aiogram.dispatcher import FSMContext
 from app.create_bot import dp, bot
 from app.states import UserFollowing
 from app.handlers import admin
+from app.utils.Bridger import Bridger
 
 
 @dp.message_handler(Text(equals=["🆕 New keys"]), state=UserFollowing.choose_point)
@@ -27,13 +28,23 @@ async def new_private_keys(message: types.Message):
 async def get_new_private_keys(message: types.Message, state: FSMContext):
     wait_message = await message.answer("⏳ Getting private keys...", reply_markup=ReplyKeyboardRemove())
 
+    random_amount = []
+
     if int(message.from_user.id) in admin.list_of_prem_users:
         private_keys = message.text.split('\n')[:50]
         message_response = "😌 *Keys saved successfully (max. 50) *"
+
+        for _ in private_keys:
+            random_amount.append(Bridger.choose_random_amount(0.009501, 0.01003))
     else:
         private_keys = message.text.split('\n')[:10]
         message_response = "😌 *Keys saved successfully (max. 10) *"
+
+        for _ in private_keys:
+            random_amount.append(Bridger.choose_random_amount(0.009501, 0.01003))
+
     await state.update_data(private_keys=private_keys)
+    await state.update_data(random_amount=random_amount)
 
     await bot.delete_message(chat_id=wait_message.chat.id,
                              message_id=wait_message.message_id)
