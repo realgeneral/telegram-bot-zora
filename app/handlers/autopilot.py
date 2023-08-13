@@ -18,15 +18,12 @@ from app.utils.configs.ipfs import imageURI_list_hashes
 
 @dp.message_handler(Text(equals="💸 Tap 2 earn"), state=UserFollowing.choose_point)
 async def tap_to_earn(message: types.Message):
-    message_response = "### *Activity Progress Section* \n \n" \
-                       "You've entered the activity progression section, which includes the following stages:\n" \
-                       "1. _Bridge_ \n" \
-                       "2. _Contract Creation_ \n" \
-                       "3. _Warming Up_ \n" \
-                       "4. _NFT Minting_ \n\n" \
-                       "The estimated time to complete these activities is around 8 hours on average. \n" \
-                       "Minimum required wallet balance: **ETH()** \n " \
-                       "To interrupt the process, simply press the *Stop* button.\n"
+    message_response = "*Bot's superpowers: * \n \n" \
+                       "• 📩 Bridge to Zora Mainnet from ETH Mainnet \n\n" \
+                       "• 🀄️ Create NFTs  \n\n" \
+                       "• 🖼 Mint important NFTs (updated list)  \n\n" \
+                       "• 🏋️‍♂️ Wallet warm-up (simulation of real human actions)  \n\n" \
+                       "• ⛽️ GWEI downgrade mode - literally lowers the fees to zero \n\n"
 
     b1 = KeyboardButton("🛫 Take off")
     b2 = KeyboardButton("⛔️ Stop ⛔️")
@@ -68,7 +65,7 @@ def random_time():
 
 
 async def mint_1(minter):
-    return await minter.purchase("0x3f1201a68b513049f0f6e182f742a0dce970d8cd", value_to_send=0.000777)
+    return await minter.purchase("0x3f1201a68b513049f0f6e182f742a0dce970d8cd", value_to_send=0.001554)
 
 
 async def mint_2(minter):
@@ -84,7 +81,7 @@ async def mint_4(minter):
 
 
 async def mint_5(minter):
-    await minter.purchase("0xbc8ae1adbfb0052babae00d3211f0be30f1fbd5c", value_to_send=0.000777)
+    return await minter.purchase("0xbc8ae1adbfb0052babae00d3211f0be30f1fbd5c", value_to_send=0.000777)
 
 
 async def mint_6(minter):
@@ -100,14 +97,7 @@ async def mint_8(minter):
 
 
 async def mint_9(minter):
-    return await minter.purchase("0xf6087d1e9be8b71b339a4a80f31e8826af9d0fbb", value_to_send=0.000777)
-
-
-# async def create_contract(minter, name, symbol, description, mintPrice, mintLimitPerAddress, editionSize, royaltyBPS,
-#                           imageURI):
-#     await minter.createERC721(name=name, symbol=symbol, description=description, mintPrice=mintPrice,
-#                               mintLimitPerAddress=mintLimitPerAddress,
-#                               editionSize=editionSize, royaltyBPS=royaltyBPS, imageURI=imageURI)
+    return await minter.purchase("0x706bafabdd00ceac5b66600901a2b1d1f4992b9d", value_to_send=0.000777)
 
 
 @dp.message_handler(Text(equals="🛫 Take off"), state=UserFollowing.tap_to_earn)
@@ -131,12 +121,15 @@ async def start_earn(message: types.Message, state: FSMContext):
         return
 
     bridgers_obj = [Bridger(private_key) for private_key in private_keys]
+    bridge_data = await state.get_data()
+    bridge_amount = list(bridge_data.get("random_amount"))
 
     bridgers_counter = 1
     bridgers_result_list = []
-    for bridgers in bridgers_obj:
-        resilt_of_bridge = await bridgers.eth_zora_bridge(Bridger.choose_random_amount(0.0073, 0.0074))
-        bridgers_result_list.append(resilt_of_bridge)
+
+    for bridgers, random_amount in zip(bridgers_obj, bridge_amount):
+        result_of_bridge = await bridgers.eth_zora_bridge(random_amount)
+        bridgers_result_list.append(result_of_bridge)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
                                     message_id=wait_message.message_id,
                                     text=f"⏳ Bridge {bridgers_counter}/{count_private_keys}")
@@ -146,6 +139,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
         bridgers_counter += 1
         # await asyncio.sleep(random.randint(5, 20))
+        await asyncio.sleep(30)
 
     bridge_statistic = "📊 Statistic \n\n" \
                        " # Bridge  \n"
@@ -165,7 +159,7 @@ async def start_earn(message: types.Message, state: FSMContext):
                                 message_id=wait_message.message_id,
                                 text=bridge_statistic + f"\n Sleeping on {sleep_on_0} sec ...")
     # await asyncio.sleep(60)
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -192,6 +186,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     for elem in imageURI_list_hashes:
         imageURI_list.append("ipfs://" + elem)
+    random.shuffle(imageURI_list)
 
     contract_counter = 1
     list_of_contract_result = []
@@ -216,6 +211,7 @@ async def start_earn(message: types.Message, state: FSMContext):
                                     message_id=wait_message.message_id,
                                     text=f"⏳ Creating ERC721 {contract_counter}/{count_private_keys}")
         contract_counter += 1
+        await asyncio.sleep(30)
         # await asyncio.sleep(random.randint(7200, 14400)) TODO
 
     for i in range(len(list_of_contract_result)):
@@ -233,7 +229,6 @@ async def start_earn(message: types.Message, state: FSMContext):
                                 message_id=wait_message.message_id,
                                 text=wait_message_text + f"\nSleeping on {sleep_on_1} sec ...")
     # await asyncio.sleep(30)
-    await asyncio.sleep(4)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -267,7 +262,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         warm_up_statistic += f"{i + 1}. {warm_up_result_1_list[i]} \n"
 
     await state.update_data(final_statistic=final_statistic)
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -297,7 +292,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         warm_up_statistic += f"{i + 1}. {warm_up_result_2_list[i]} \n"
 
     await state.update_data(final_statistic=final_statistic)
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -321,7 +316,8 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
+
     for i in range(len(warm_up_result_3_list)):
         final_statistic += f"{i + 1}. {warm_up_result_3_list[i]} \n"
         warm_up_statistic += f"{i + 1}. {warm_up_result_3_list[i]} \n"
@@ -338,7 +334,7 @@ async def start_earn(message: types.Message, state: FSMContext):
                                 message_id=wait_message.message_id,
                                 text=warm_up_statistic + f"\n Sleeping on {sleep_on_2} sec ...")
     # await asyncio.sleep(sleep_on_2)
-    await asyncio.sleep(4)
+    # await asyncio.sleep(4)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -348,6 +344,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     mints_func = [mint_1, mint_2, mint_3, mint_4, mint_5, mint_6, mint_7, mint_8, mint_9]
     minters_obj_for_mint = [Minter(private_key) for private_key in private_keys]
+    used_functions_by_minters = {minter: [] for minter in minters_obj_for_mint}
 
     # 1
     mint_statistic = "📊 Statistic \n\n" \
@@ -357,8 +354,16 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     mint_1_counter = 1
     mint_1_result_list = []
+
     for minter in minters_obj_for_mint:
+        while mints_func[0] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[0])
+
         mint_1_result = await mints_func[0](minter)
+
+        if mint_1_result is None:
+            mint_1_result = "❌ Something went wrong"
         mint_1_result_list.append(mint_1_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -379,7 +384,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -392,7 +397,15 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_2_counter = 1
     mint_2_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[1] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[1])
+
         mint_2_result = await mints_func[1](minter)
+
+        if mint_2_result is None:
+            mint_2_result = "❌ Something went wrong"
+
         mint_2_result_list.append(mint_2_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -413,7 +426,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -426,7 +439,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_3_counter = 1
     mint_3_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[2] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[2])
+
         mint_3_result = await mints_func[2](minter)
+
+        if mint_3_result is None:
+            mint_3_result = "❌ Something went wrong"
         mint_3_result_list.append(mint_3_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -447,7 +467,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -460,7 +480,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_4_counter = 1
     mint_4_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[3] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[3])
+
         mint_4_result = await mints_func[3](minter)
+
+        if mint_4_result is None:
+            mint_4_result = "❌ Something went wrong"
         mint_4_result_list.append(mint_4_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -481,7 +508,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
         return
@@ -493,7 +520,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_5_counter = 1
     mint_5_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[4] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[4])
+
         mint_5_result = await mints_func[4](minter)
+
+        if mint_5_result is None:
+            mint_5_result = "❌ Something went wrong"
         mint_5_result_list.append(mint_5_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -514,7 +548,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
         return
@@ -526,7 +560,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_6_counter = 1
     mint_6_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[5] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[5])
+
         mint_6_result = await mints_func[5](minter)
+
+        if mint_6_result is None:
+            mint_6_result = "❌ Something went wrong"
         mint_6_result_list.append(mint_6_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -547,7 +588,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
         return
@@ -559,7 +600,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_7_counter = 1
     mint_7_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[6] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[6])
+
         mint_7_result = await mints_func[6](minter)
+
+        if mint_7_result is None:
+            mint_7_result = "❌ Something went wrong"
         mint_7_result_list.append(mint_7_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -580,7 +628,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
 
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
@@ -593,7 +641,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_8_counter = 1
     mint_8_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[7] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[7])
+
         mint_8_result = await mints_func[7](minter)
+
+        if mint_8_result is None:
+            mint_8_result = "❌ Something went wrong"
         mint_8_result_list.append(mint_8_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -614,10 +669,12 @@ async def start_earn(message: types.Message, state: FSMContext):
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
-    await asyncio.sleep(4)
+    await asyncio.sleep(30)
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
         return
+
+
 
     # 9
     mint_statistic += "\n Mint #9 \n"
@@ -626,7 +683,14 @@ async def start_earn(message: types.Message, state: FSMContext):
     mint_9_counter = 1
     mint_9_result_list = []
     for minter in minters_obj_for_mint:
+        while mints_func[8] in used_functions_by_minters[minter]:
+            random.shuffle(mints_func)
+        used_functions_by_minters[minter].append(mints_func[8])
+
         mint_9_result = await mints_func[8](minter)
+
+        if mint_9_result is None:
+            mint_9_result = "❌ Something went wrong"
         mint_9_result_list.append(mint_9_result)
         random.shuffle(mints_func)
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -645,6 +709,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await bot.delete_message(chat_id=wait_message.chat.id,
                              message_id=wait_message.message_id)
+
 
     buttons = [
         KeyboardButton(text="⬅ Go to menu"),
