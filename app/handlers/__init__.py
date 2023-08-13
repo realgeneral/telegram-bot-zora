@@ -4,5 +4,6 @@ from .admin import dp
 from .new_keys import dp
 from .check_keys import dp
 from .autopilot import dp
+from .check_balance import dp
 
 __all__ = ["dp"]
