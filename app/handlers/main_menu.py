@@ -34,12 +34,13 @@ async def send_menu(message: types.Message, state: FSMContext):
     message_response += "\n Choose an action:"
 
     b1 = KeyboardButton("👝 Check balance")
-    b2 = KeyboardButton("💸 Tap 2 earn")
-    b3 = KeyboardButton("🆕 New keys")
-    b4 = KeyboardButton("🔑 Check keys")
+    b2 = KeyboardButton("⛽️ Check GWEI")
+    b3 = KeyboardButton("💸 Tap 2 earn")
+    b4 = KeyboardButton("🆕 New keys")
+    b5 = KeyboardButton("🔑 Check keys")
 
     buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons.row(b1).row(b2, b4).row(b3)
+    buttons.row(b3).row(b1, b2).row(b4, b5)
 
     await UserFollowing.choose_point.set()
     await message.answer(message_response, parse_mode=types.ParseMode.MARKDOWN,

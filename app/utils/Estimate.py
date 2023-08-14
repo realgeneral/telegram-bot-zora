@@ -74,3 +74,10 @@ class Estimate:
         except Exception as err:
             logger.error(f"Error while getting balance: {err}")
             return "-"
+
+    @staticmethod
+    def get_current_gas():
+        web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+        logger.info(f"Successfully connected to {rpcs['eth']}")
+        gas_price = web3.eth.gas_price
+        return round(Web3.from_wei(gas_price, 'gwei'), 2)

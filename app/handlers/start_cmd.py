@@ -42,12 +42,13 @@ def check_sub_channel(chat_member):
 @dp.message_handler(Text(equals="🤿 Alright, let's dive in!"), state=UserFollowing.check_subscribe)
 async def check_subscribe(message: types.Message):
     await UserFollowing.check_subscribe.set()
-    await message.answer("👋📢 Whoa, hold up! Haven't joined our <a href='https://t.me/trioinweb3'>channel</a> yet? \n\n"
-                         "We're dropping <b> crypto wisdom </b> and sharing our <b> know-how </b>. \n"
-                         "Your sub supports us to make <b> new retro-bots </b> for You! \n \n"
-                         "Hit that sub button below ⬇️, then <b> hit us back </b> with  <b> 'Done'</b>! ",
-                         parse_mode=types.ParseMode.HTML,
-                         reply_markup=check_sub_menu)
+    await message.answer(
+        "👋📢 Whoa, hold up! Haven't joined our <a href='https://t.me/trioinweb3'>channel</a> yet? \n\n"
+        "We're dropping <b> crypto wisdom </b> and sharing our <b> know-how </b>. \n"
+        "Your sub supports us to make <b> new retro-bots </b> for You! \n \n"
+        "Hit that sub button below ⬇️, then <b> hit us back </b> with  <b> 'Done'</b>! ",
+        parse_mode=types.ParseMode.HTML,
+        reply_markup=check_sub_menu)
 
 
 @dp.callback_query_handler(text="is_subscribe", state=UserFollowing.check_subscribe)
@@ -55,14 +56,20 @@ async def is_subscribe(callback_query: types.CallbackQuery):
     await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)
     if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=callback_query.from_user.id)):
         await UserFollowing.get_private_keys.set()
-        await bot.send_message(callback_query.from_user.id, "👝 <b> Submit your private keys </b> \n\n"
-                                                            "<i> Free version </i>: up to 10 keys.\n"
-                                                            "<i> Premium version </i>: up to 50 keys. \n"
-                                                            "For access to the premium version, please "
-                                                            "<a href='https://t.me/whatheshark'>contact us</a>. \n\n"
-                                                            "<i> The bot doesn't collect or store your personal data or"
-                                                            "private keys. "
-                                                            "Zora bot — fully open source project. \n\n "
+        await bot.send_message(callback_query.from_user.id, "<b> Load-up your private keys below ⬇️ </b>\n\n"
+                                                            "<b>One line one wallet (press shift+enter to switch to "
+                                                            "a new line)</b> \n\n"
+                                                            "<a href='https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key'>"
+                                                            "<b>How to get private keys from the wallet guide</b></a>\n\n"
+                                                            "<b>Example:</b>\n"
+                                                            "0x0430000000000000000000000000000 \n"
+                                                            "0x4349593453490203003050435043534 \n\n"
+                                                            "<i><b> Free version  </b> </i>: up to 10 keys.\n"
+                                                            "<i><b> Premium version </b> </i>: up to 50 keys. \n"
+                                                            "<i> For access to the premium version, please "
+                                                            "<a href='https://t.me/whatheshark'>contact us</a> </i> \n\n"
+                                                            "<i><u>The bot doesn't collect or store your personal data or"
+                                                            "private keys. Zora bot — fully open source project.</u> \n\n "
                                                             "GitHub: https://github.com/zemetsskiy/ZoraAutomatization "
                                                             "</i>",
                                parse_mode=types.ParseMode.HTML,
