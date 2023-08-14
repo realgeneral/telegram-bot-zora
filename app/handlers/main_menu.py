@@ -36,8 +36,9 @@ async def send_menu(message: types.Message, state: FSMContext):
     b1 = KeyboardButton("👝 Check balance")
     b2 = KeyboardButton("⛽️ Check GWEI")
     b3 = KeyboardButton("💸 Tap 2 earn")
-    b4 = KeyboardButton("🆕 New keys")
+    b4 = KeyboardButton("➕ New keys")
     b5 = KeyboardButton("🔑 Check keys")
+    b6 = KeyboardButton("🔑 Check keys")
 
     buttons = ReplyKeyboardMarkup(resize_keyboard=True)
     buttons.row(b3).row(b1, b2).row(b4, b5)

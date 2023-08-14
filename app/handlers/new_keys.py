@@ -9,7 +9,7 @@ from app.handlers import admin
 from app.utils.Bridger import Bridger
 
 
-@dp.message_handler(Text(equals=["🆕 New keys"]), state=UserFollowing.choose_point)
+@dp.message_handler(Text(equals=["➕ New keys"]), state=UserFollowing.choose_point)
 async def new_private_keys(message: types.Message):
     await UserFollowing.new_private.set()
     await message.answer("👝 *Submit your private key's* \n\n"
