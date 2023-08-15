@@ -21,27 +21,24 @@ async def go_menu(message: types.Message, state: FSMContext):
         await state.update_data(private_keys=private_keys)
 
     await UserFollowing.wallet_menu.set()
-    await send_menu(message, state)
+    await send_menu(message)
 
 
 @dp.message_handler(state=UserFollowing.wallet_menu)
-async def send_menu(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    private_keys = list(data.get("private_keys"))
-    message_response = "# *Private key`s* \n"
-    for i in range(len(private_keys)):
-        message_response += f"{i+1}. *{private_keys[i][0:6]}...{private_keys[i][-4:]}* \n"
-    message_response += "\n Choose an action:"
+async def send_menu(message: types.Message):
+
+    message_response = "🫡 Waiting for your instructions...\n " \
+                        "🔽 Choose the button below 🔽"
 
     b1 = KeyboardButton("👝 Check balance")
     b2 = KeyboardButton("⛽️ Check GWEI")
     b3 = KeyboardButton("💸 Tap 2 earn")
     b4 = KeyboardButton("➕ New keys")
     b5 = KeyboardButton("🔑 Check keys")
-    b6 = KeyboardButton("🔑 Check keys")
+    b6 = KeyboardButton("ℹ️ FAQ")
 
     buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons.row(b3).row(b1, b2).row(b4, b5)
+    buttons.row(b3).row(b1, b2).row(b4, b5).row(b6)
 
     await UserFollowing.choose_point.set()
     await message.answer(message_response, parse_mode=types.ParseMode.MARKDOWN,
