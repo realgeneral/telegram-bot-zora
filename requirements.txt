@@ -1,0 +1,5 @@
+loguru~=0.7.0
+web3~=6.6.1
+aiogram~=2.25.1
+asyncio~=3.4.3
+htppx~=0.24.1
