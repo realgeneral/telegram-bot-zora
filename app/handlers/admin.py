@@ -43,9 +43,12 @@ async def add_prem_user(message: types.Message):
 @dp.message_handler(state=AdminMode.add_user)
 async def save_prem_user(message: types.Message):
     telegram_id = message.text
-    list_of_prem_users.append(int(telegram_id))
+    try:
+        list_of_prem_users.append(int(telegram_id))
+        message_response = "Saved"
+    except Exception as err_:
+        message_response = f"Not saved: {err_}"
 
-    message_response = "Saved"
     buttons = [
         KeyboardButton(text="⬅ Go to admin menu"),
     ]
@@ -68,7 +71,7 @@ async def get_today_logs(message: types.Message):
     today = datetime.datetime.now().strftime('%Y-%m-%d')
     today_logs = []
 
-    with open("app/logs/logs.log", 'r') as f:
+    with open("logs/logs.log", 'r') as f:
         for line in f:
             if line.startswith(today):
                 today_logs.append(line.strip())
