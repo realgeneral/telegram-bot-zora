@@ -23,17 +23,18 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
     private_keys = list(data.get("private_keys"))
 
     if len(private_keys) == 1:
-        reply_message = f"✅ {len(private_keys)} wallets is loaded:\n\n"
+        reply_message = f"✅ {len(private_keys)} wallet is loaded:\n\n"
     else:
         reply_message = f"✅ {len(private_keys)} wallets are loaded:\n\n"
 
-    reply_message += "To stop Bot, press  *«🛑Stop!»* "
     for i in range(len(private_keys)):
         es = Estimate(private_keys[i])
         reply_message += f"*Wallet #{i+1}* \n"
         reply_message += f"{es.get_eth_address()}\n\n"
 
-    b1 = KeyboardButton("🛫 Take off")
+    reply_message += "To stop Bot, press  *«⛔️ Stop ⛔️»* "
+
+    b1 = KeyboardButton("🐳 LFG!")
     b2 = KeyboardButton("⛔️ Stop ⛔️")
     b3 = KeyboardButton("⬅ Go to menu")
 
@@ -136,7 +137,7 @@ async def mint_9(minter):
     return await minter.purchase("0x706bafabdd00ceac5b66600901a2b1d1f4992b9d", value_to_send=0.000777)
 
 
-@dp.message_handler(Text(equals="🛫 Take off"), state=UserFollowing.tap_to_earn)
+@dp.message_handler(Text(equals="🐳 LFG!"), state=UserFollowing.tap_to_earn)
 async def start_earn(message: types.Message, state: FSMContext):
     data = await state.get_data()
     private_keys = list(data.get("private_keys"))
