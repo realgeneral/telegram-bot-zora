@@ -16,7 +16,7 @@ class Minter:
         self.collectionAddress = ""
 
     async def mint(self, nft_address, nft_id: int):
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={'proxies':{'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094", 'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
         try:
@@ -83,9 +83,8 @@ class Minter:
 
     async def purchase(self, nft_contract_address, value_to_send): # ZoraCreator1155Impl
 
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
-            'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094",
-                        'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
+
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
         try:
@@ -149,9 +148,8 @@ class Minter:
 
     async def createERC721(self, name, symbol, mintPrice, mintLimitPerAddress, editionSize, royaltyBPS, description, imageURI): # ZoraNFTCreator
 
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
-            'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094",
-                        'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
+
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
         try:
@@ -220,9 +218,8 @@ class Minter:
                 return "❌ Something went wrong"
 
     async def walletWarmUp1(self, nft_collection_address, uri): # Mint web page update emulating
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
-            'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094",
-                        'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
+
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
         try:
@@ -277,9 +274,8 @@ class Minter:
                 return "❌ Something went wrong"
 
     async def walletWarmUp2(self, nft_collection_address, publicSalePrice):  # Mint price updating
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
-            'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094",
-                        'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
+
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
         try:

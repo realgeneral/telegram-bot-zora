@@ -29,7 +29,7 @@ class Estimate:
             gas_price = web3.eth.gas_price * 1.15
 
             total_cost_eth = Web3.from_wei(gas_estimate * gas_price, 'ether')
-            #logger.info(f"Estimated Gas: {gas_estimate} Gas Price: {round(Web3.from_wei(gas_price, 'gwei'), 2)} gwei Total Cost: {total_cost_eth} ETH")
+
             return total_cost_eth
         except Exception as err:
             logger.error(f"Error while bridge estimating price: {err}")
@@ -55,7 +55,7 @@ class Estimate:
             return "-"
 
     def get_zora_balance(self):
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={'proxies':{'https': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094", 'http': 'http://' + "pnorwyha:snmfocltb81h@209.99.165.189:6094"}}))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
         logger.info(f"Successfully connected to {rpcs['zora']}")
         try:
             wallet_address = web3.eth.account.from_key(self.pk).address
