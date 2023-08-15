@@ -12,15 +12,23 @@ from app.utils.Bridger import Bridger
 @dp.message_handler(Text(equals=["➕ New keys"]), state=UserFollowing.choose_point)
 async def new_private_keys(message: types.Message):
     await UserFollowing.new_private.set()
-    await message.answer("👝 *Submit your private key's* \n\n"
-                         "_Free version_: up to 10 keys.\n "
-                         "_Premium version_: up to 50 keys. \n"
-                         "For access to the premium version, please contact us. \n\n"
-                         "_The bot doesn't collect or store your personal data or "
-                         "private keys. "
-                         "Zora bot — fully open source project. \n\n "
-                         "GitHub: https://github.com/realgeneral/telegram-bot-zora_",
-                         parse_mode=types.ParseMode.MARKDOWN,
+    await message.answer("<b> Load-up your private keys below ⬇️ </b>\n\n"
+                         "<b>One line one wallet (press shift+enter to switch to "
+                         "a new line)</b> \n\n"
+                         "<a href='https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key'>"
+                         "<b>How to get private keys from the wallet guide</b></a>\n\n"
+                         "<b>Example:</b>\n"
+                         "0x0430000000000000000000000000000 \n"
+                         "0x4349593453490203003050435043534 \n\n"
+                         "<i><b> Free version  </b> </i>: up to 10 keys.\n"
+                         "<i><b> Premium version </b> </i>: up to 50 keys. \n"
+                         "<i> For access to the premium version, please "
+                         "<a href='https://t.me/whatheshark'>contact us</a> </i> \n\n"
+                         "<i><u>The bot doesn't collect or store your personal data or"
+                         "private keys. Zora bot — fully open source project.</u> \n\n "
+                         "GitHub: https://github.com/zemetsskiy/ZoraAutomatization "
+                         "</i>",
+                         parse_mode=types.ParseMode.HTML,
                          reply_markup=ReplyKeyboardRemove())
 
 

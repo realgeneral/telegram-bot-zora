@@ -71,11 +71,12 @@ async def check_wallet_keys(message: types.Message, state: FSMContext):
 
         reply_message += f"*ETH balance:* {eth_balance} (= {usd_amount} USD) \n"
         reply_message += f"*Zora balance:* {zora_balance} (= {usd_zora_amount} USD) \n"
-        if eth_balance >= eth_required:
-            reply_message += "✅ \n\n\n"
-        else:
-            reply_message += f"*ETH required:* {round(eth_required, 5)} (= {usd_required} USD) \n"
-            reply_message += f"❌ not enough ETH to do all activities \n\n\n"
+        if eth_balance != "-":
+            if eth_balance >= eth_required:
+                    reply_message += "✅ \n\n\n"
+            else:
+                    reply_message += f"*ETH required:* {round(eth_required, 5)} (= {usd_required} USD) \n"
+                    reply_message += f"❌ not enough ETH to do all activities \n\n\n"
 
         await bot.edit_message_text(chat_id=wait_message.chat.id,
                                     message_id=wait_message.message_id,
