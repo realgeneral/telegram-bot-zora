@@ -67,9 +67,9 @@ class Estimate:
             return "-"
 
     def get_eth_address(self):
-        web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
-        logger.info(f"Successfully connected to {rpcs['eth']}")
         try:
+            web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+            logger.info(f"Successfully connected to {rpcs['eth']}")
             return web3.eth.account.from_key(self.pk).address
         except Exception as err:
             logger.error(f"Error while getting balance: {err}")
@@ -77,7 +77,11 @@ class Estimate:
 
     @staticmethod
     def get_current_gas():
-        web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
-        logger.info(f"Successfully connected to {rpcs['eth']}")
-        gas_price = web3.eth.gas_price
-        return round(Web3.from_wei(gas_price, 'gwei'), 2)
+        try:
+            web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+            logger.info(f"Successfully connected to {rpcs['eth']}")
+            gas_price = web3.eth.gas_price
+            return round(Web3.from_wei(gas_price, 'gwei'), 2)
+        except Exception as err:
+            logger.error(f"Error while getting gas: {err}")
+            return "-"
