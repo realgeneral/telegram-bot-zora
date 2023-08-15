@@ -82,6 +82,8 @@ async def is_subscribe(callback_query: types.CallbackQuery):
 async def private_keys(message: types.Message, state: FSMContext):
     random_amount = []
 
+    await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+
     if int(message.from_user.id) in admin.list_of_prem_users:
         private_keys = message.text.split('\n')[:50]
         for _ in private_keys:
