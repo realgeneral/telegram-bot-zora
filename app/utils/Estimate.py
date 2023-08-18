@@ -38,9 +38,10 @@ class Estimate:
     def eth_required(self, bridge_amount):
         bridge_fee = self.estimate_bridge(bridge_amount=bridge_amount)
         if bridge_fee:
-            return float(bridge_fee) + bridge_amount
+            return round(float(bridge_fee) + bridge_amount, 3)
         else:
             logger.error("Something went wrong while getting eth required value")
+            return "-"
 
     def get_eth_balance(self):
         web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
