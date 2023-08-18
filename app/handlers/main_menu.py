@@ -30,15 +30,15 @@ async def send_menu(message: types.Message):
     message_response = "🫡 Waiting for your instructions...\n " \
                         "🔽 Choose the button below 🔽"
 
-    b1 = KeyboardButton("👝 Check balance")
+    # b1 = KeyboardButton("👝 Check balance")
     b2 = KeyboardButton("⛽️ Check GWEI")
-    b3 = KeyboardButton("💸 Tap 2 earn")
-    b4 = KeyboardButton("➕ New keys")
-    b5 = KeyboardButton("🔑 Check keys")
+    b3 = KeyboardButton("💸 Start script")
+    b4 = KeyboardButton("➕ Load new wallets")
+    # b5 = KeyboardButton("🔑 Check keys")
     b6 = KeyboardButton("ℹ️ FAQ")
 
     buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons.row(b3).row(b1, b2).row(b4, b5).row(b6)
+    buttons.row(b3).row(b2, b4).row(b6)
 
     await UserFollowing.choose_point.set()
     await message.answer(message_response, parse_mode=types.ParseMode.MARKDOWN,
