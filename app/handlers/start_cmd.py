@@ -116,9 +116,6 @@ async def private_keys(message: types.Message, state: FSMContext):
         eth_balance = es.get_eth_balance()
         eth_required = es.eth_required(random)
 
-        eth_balance = 0.013
-        eth_required = 0.011
-
         message_response += f"{i + 1}. <b>{es.get_eth_address()}</b> \n"
         message_response += f"({eth_balance} ETH / {eth_required} ETH required)"
 
