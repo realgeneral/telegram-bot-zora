@@ -17,32 +17,120 @@ from app.utils.configs.ipfs import imageURI_list_hashes
 from app.utils.Estimate import Estimate
 
 
-@dp.message_handler(Text(equals="💸 Tap 2 earn"), state=UserFollowing.choose_point)
+@dp.message_handler(Text(equals="💸 Start script"), state=UserFollowing.choose_point)
 async def tap_to_earn(message: types.Message, state: FSMContext):
+    reply_message = ""
+    count_ok_wallet = 0
+
     data = await state.get_data()
+
     private_keys = list(data.get("private_keys"))
+    bridge_amount = list(data.get("random_amount"))
+    is_ready_to_start = data.get("is_ready_to_start")
 
     if len(private_keys) == 1:
-        reply_message = f"✅ {len(private_keys)} wallet is loaded:\n\n"
+        edit_message = "Waiting for refilling of the wallet...."
     else:
-        reply_message = f"✅ {len(private_keys)} wallets are loaded:\n\n"
+        edit_message = "Waiting for refilling of the wallets...."
 
-    for i in range(len(private_keys)):
+    wait_message = await message.answer(edit_message)
+
+    for i, random in zip(range(len(private_keys)), bridge_amount):
+
         es = Estimate(private_keys[i])
-        reply_message += f"*Wallet #{i+1}* \n"
-        reply_message += f"{es.get_eth_address()}\n\n"
+        eth_balance = es.get_eth_balance()
+        eth_required = es.eth_required(random)
 
-    reply_message += "To stop Bot, press  *«⛔️ Stop ⛔️»* "
+        reply_message += f"{i + 1}. <b>{es.get_eth_address()}</b> \n"
+        reply_message += f"({eth_balance} ETH / {eth_required} ETH required)"
 
-    b1 = KeyboardButton("🐳 LFG!")
-    b2 = KeyboardButton("⛔️ Stop ⛔️")
-    b3 = KeyboardButton("⬅ Go to menu")
+        if eth_balance != "-":
+            if eth_balance >= eth_required or is_ready_to_start == 1:
+                reply_message += " ✅\n"
+                count_ok_wallet += 1
+            else:
+                reply_message += " ❌\n"
 
-    buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons.row(b1, b2).row(b3)
+            await bot.edit_message_text(chat_id=wait_message.chat.id,
+                                        message_id=wait_message.message_id,
+                                        text=f"⏳ Waiting for refilling of the wallets ... {i + 1}/{len(private_keys)}")
 
-    await UserFollowing.tap_to_earn.set()
-    await message.answer(reply_message, parse_mode=types.ParseMode.MARKDOWN,
+    if count_ok_wallet == len(private_keys) or is_ready_to_start == 1:
+
+        await bot.edit_message_text(chat_id=wait_message.chat.id,
+                                    message_id=wait_message.message_id,
+                                    text=f"⏳ Preparing information about the script ... 0% ...")
+        len_pk = len(private_keys)
+
+        average_time_of_bridge = Randomiser.average_time(len_pk, Randomiser.random_bridge)
+        average_time_after_bridge = Randomiser.average_time(len_pk, Randomiser.random_bridge_after)
+        average_time_of_create = Randomiser.average_time(len_pk, Randomiser.random_contract)
+        average_time_after_create = Randomiser.average_time(len_pk, Randomiser.random_contract_after)
+        average_time_of_warm_up = 3 * Randomiser.average_time(len_pk, Randomiser.random_warm_up)
+        average_time_after_warm_up = 3 * Randomiser.average_time(len_pk, Randomiser.random_warm_up_after)
+        average_time_of_mint_erc_721 = 7 * Randomiser.average_time(len_pk, Randomiser.random_mint)
+        average_time_of_mint_erc_1155 = 2 * Randomiser.average_time(len_pk, Randomiser.random_mint)
+        average_time_after_mints = 8 * Randomiser.average_time(len_pk, Randomiser.random_mint_after)
+        total_time = int(
+            (average_time_of_bridge + average_time_after_bridge + average_time_of_create + average_time_after_create
+             + average_time_after_warm_up + average_time_after_warm_up + average_time_of_mint_erc_721
+             + average_time_of_mint_erc_1155 + average_time_after_mints) / 60)
+
+        await bot.edit_message_text(chat_id=wait_message.chat.id,
+                                    message_id=wait_message.message_id,
+                                    text=f"⏳ Preparing information about the script ... 50% ...")
+
+        reply_message += f"\n📍 Total сount of wallets: <b>{len_pk}</b>\n\n"
+        reply_message += f"<b>Bot superpower's:</b>\n\n"
+        reply_message += f"📩 <b>Use official Zora Bridge (Ethereum mainnet —> Zora mainnet)</b> ~ {average_time_of_bridge} mins\n" \
+                         f"       Sleep after Bridge ~ {average_time_after_bridge} mins\n\n"
+        reply_message += f"🀄️ <b>NFT Creation</b> ~ {average_time_of_create} mins\n" \
+                         f"       Sleep after creating ~ {average_time_after_create} mins\n\n"
+        reply_message += f"🏋️‍♂ <b>Wallet warm-up's</b> ~ {average_time_of_warm_up} mins\n" \
+                         f"       Sleep after all warm-up's ~ {average_time_after_warm_up} mins\n\n"
+        reply_message += f"🔀 <b>Randomize mint ERC 1155 NFT'S (2)</b> ~ {average_time_of_mint_erc_1155} mins\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0x5CA17551b686bAF0C6bd7727e153B95be9b1Ae0D'>Diagrammatics</a></i>\n"\
+                         f"       • <i><a href='https://zora.co/collect/zora:0x4c0c2dd31d2661e8bcec60a42e803dcc6f81baad'>Pattern Recognition</a></i>\n\n" \
+
+        reply_message += f"🔀 <b>Randomize mint ERC 721 NFT'S (7)</b> ~ {average_time_of_mint_erc_721} mins\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0x3f1201a68b513049f0f6e182f742a0dce970d8cd'>Zora Merch - Limited Edition Hoodie</a></i>\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0x34573d139A15e5d3D129AD6AE20c3C8B221fD921'>50M LayerZero Messages</a></i>\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0xbc8ae1adbfb0052babae00d3211f0be30f1fbd5c'>3NUM Shield Opepen</a></i>\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0xcba60a105b5c2fdaf9dd27e733132cc4f7ac9a66'>Holograph VIP</a></i>\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0xd4889d519b1ab9b2fa8634e0271118de480f6d32'>BLACK DAVE - Meet the TOPIANS</a></i>\n"\
+                         f"       • <i><a href='https://zora.co/collect/zora:0xcdc9c8060c7c357ee25cd80455cbe05b226d291f'>WEB3PLOTMANS</a></i>\n" \
+                         f"       • <i><a href='https://zora.co/collect/zora:0x706bafabdd00ceac5b66600901a2b1d1f4992b9d'>Polyhedra live on Mantle Network Mainnet</a></i>\n" \
+                         f"  Sleep after all mints ~ {average_time_after_mints} mins\n\n"
+
+        reply_message += f"🕔 <b>Total time</b> ~ {total_time} hours *\n\n" \
+                         f"<i>* We stretch out time to imitate how humans act</i>\n\n"
+        reply_message += "To stop script, press   <b>«⛔️ Stop ⛔️»</b> "
+
+        await bot.edit_message_text(chat_id=wait_message.chat.id,
+                                    message_id=wait_message.message_id,
+                                    text=f"⏳ Preparing information about the script ... 100% ...")
+
+        b1 = KeyboardButton("🐳 LFG!")
+        b2 = KeyboardButton("⛔️ Stop ⛔️")
+        b3 = KeyboardButton("⬅ Go to menu")
+
+        buttons = ReplyKeyboardMarkup(resize_keyboard=True)
+        buttons.row(b1, b2).row(b3)
+        await UserFollowing.tap_to_earn.set()
+    else:
+        reply_message += "\n\n💳 Refill your wallet balance and try again \n\n" \
+                         "Now deposit require ETH amount in <b>Ethereum Mainnet, using your CEX!</b> * (Withdrawal " \
+                         f"takes ~ 5 minutes)\n\n " \
+                         "<i><u> * Be sure to use CEX or you'll link your wallets and become sybil 💀</u></i>"
+
+        b3 = KeyboardButton("⬅ Go to menu")
+
+        buttons = ReplyKeyboardMarkup(resize_keyboard=True)
+        buttons.row(b3)
+
+    await bot.delete_message(chat_id=wait_message.chat.id,
+                             message_id=wait_message.message_id)
+    await message.answer(reply_message, parse_mode=types.ParseMode.HTML,
                          reply_markup=buttons)
 
 
@@ -67,38 +155,6 @@ async def stop_earn(message: types.Message, state: FSMContext):
     await message.answer(message_response,
                          parse_mode=types.ParseMode.HTML,
                          reply_markup=reply_markup)
-
-
-def random_bridge():
-    return random.randint(90, 180)
-
-
-def random_bridge_after():
-    return random.randint(40, 65)
-
-
-def random_contract():
-    return random.randint(240, 300)
-
-
-def random_contract_after():
-    return random.randint(600, 900)
-
-
-def random_warm_up():
-    return random.randint(240, 300)
-
-
-def random_warm_up_after():
-    return random.randint(3600, 4500)
-
-
-def random_mint():
-    return random.randint(240, 300)
-
-
-def random_mint_after():
-    return random.randint(1800, 2700)
 
 
 async def mint_1(minter):
@@ -175,7 +231,7 @@ async def start_earn(message: types.Message, state: FSMContext):
             return
 
         bridgers_counter += 1
-        await asyncio.sleep(random_bridge())
+        await asyncio.sleep(Randomiser.random_bridge())
 
     bridge_statistic = "📊 Statistic \n\n" \
                        " # Bridge (ETH Mainnet —> Zora Mainnet)  \n"
@@ -190,7 +246,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     ##############################################################################################
 
-    sleep_on_0 = random_bridge_after()
+    sleep_on_0 = Randomiser.random_bridge_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=bridge_statistic + f"\n Sleeping on {sleep_on_0} sec ...")
@@ -247,7 +303,7 @@ async def start_earn(message: types.Message, state: FSMContext):
                                     text=f"⏳ Creating ERC721 {contract_counter}/{count_private_keys}")
         contract_counter += 1
 
-        await asyncio.sleep(random_contract())
+        await asyncio.sleep(Randomiser.random_contract())
 
     for i in range(len(list_of_contract_result)):
         final_statistic += f"Wallet {i + 1}: {list_of_contract_result[i]} \n"
@@ -259,7 +315,7 @@ async def start_earn(message: types.Message, state: FSMContext):
     if user_data.get("stop_flag"):
         return
 
-    sleep_on_1 = random_contract_after()
+    sleep_on_1 = Randomiser.random_contract_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=wait_message_text + f"\nSleeping on {sleep_on_1} sec ...")
@@ -290,7 +346,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_warm_up())
+        await asyncio.sleep(Randomiser.random_warm_up())
 
     for i in range(len(warm_up_result_1_list)):
         final_statistic += f"Wallet {i + 1}: {warm_up_result_1_list[i]} \n"
@@ -298,7 +354,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on_warm_up_1 = random_warm_up_after()
+    sleep_on_warm_up_1 = Randomiser.random_warm_up_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=warm_up_statistic + f"\nSleeping on {sleep_on_warm_up_1} sec ...")
@@ -325,7 +381,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_warm_up())
+        await asyncio.sleep(Randomiser.random_warm_up())
 
     for i in range(len(warm_up_result_2_list)):
         final_statistic += f"Wallet {i + 1}: {warm_up_result_2_list[i]} \n"
@@ -333,7 +389,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on_warm_up_2 = random_warm_up_after()
+    sleep_on_warm_up_2 = Randomiser.random_warm_up_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=warm_up_statistic + f"\nSleeping on {sleep_on_warm_up_2} sec ...")
@@ -361,7 +417,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_warm_up())
+        await asyncio.sleep(Randomiser.random_warm_up())
 
     for i in range(len(warm_up_result_3_list)):
         final_statistic += f"Wallet {i + 1}: {warm_up_result_3_list[i]} \n"
@@ -375,7 +431,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     ##############################################################################################
 
-    sleep_on_warm_up_3 = random_warm_up_after()
+    sleep_on_warm_up_3 = Randomiser.random_warm_up_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=warm_up_statistic + f"\nSleeping on {sleep_on_warm_up_3} sec ...")
@@ -411,7 +467,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         mint_1_result = await mints_func[0](minter)
 
         if mint_1_result is None:
-            mint_1_result = "❌ Something went wrong"\
+            mint_1_result = "❌ Something went wrong"
 
         mint_1_result_list.append(mint_1_result)
         random.shuffle(mints_func)
@@ -425,7 +481,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_1_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_1_result_list[i]} \n"
@@ -433,7 +489,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -470,7 +526,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_2_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_2_result_list[i]} \n"
@@ -478,7 +534,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -514,7 +570,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_3_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_3_result_list[i]} \n"
@@ -522,7 +578,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -561,7 +617,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_4_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_4_result_list[i]} \n"
@@ -569,7 +625,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -608,7 +664,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_5_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_5_result_list[i]} \n"
@@ -616,7 +672,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -655,7 +711,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_6_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_6_result_list[i]} \n"
@@ -663,7 +719,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -702,7 +758,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_7_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_7_result_list[i]} \n"
@@ -710,7 +766,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -748,7 +804,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_8_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_8_result_list[i]} \n"
@@ -756,7 +812,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
     await state.update_data(final_statistic=final_statistic)
 
-    sleep_on = random_mint_after()
+    sleep_on = Randomiser.random_mint_after()
     await bot.edit_message_text(chat_id=wait_message.chat.id,
                                 message_id=wait_message.message_id,
                                 text=mint_statistic + f"\n Sleeping on {sleep_on} sec ...")
@@ -765,7 +821,6 @@ async def start_earn(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     if user_data.get("stop_flag"):
         return
-
 
     # 9
     mint_statistic += "\n Mint #9 \n"
@@ -796,13 +851,15 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        await asyncio.sleep(random_mint())
+        await asyncio.sleep(Randomiser.random_mint())
 
     for i in range(len(mint_9_result_list)):
         final_statistic += f"Wallet {i + 1}: {mint_9_result_list[i]} \n"
         mint_statistic += f"Wallet {i + 1}: {mint_9_result_list[i]} \n"
 
+    is_ready_to_start = 0
     await state.update_data(final_statistic=final_statistic)
+    await state.update_data(is_ready_to_start=is_ready_to_start)
 
     await bot.delete_message(chat_id=wait_message.chat.id,
                              message_id=wait_message.message_id)
