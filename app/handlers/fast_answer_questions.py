@@ -71,7 +71,7 @@ async def premium_version(message: types.Message):
                     '2. Click on the "👝 <b> Check Balance </b>" button. Based on the GWEI values, we will select the exact deposit amount to make all Zora activities.\n\n' \
                     '3. Send the quoted ETH from your CEX to your wallet in Ethereum Mainnet Chain\n ' \
                     '( ❗️be sure to send it with <b> CEX </b> )\n\n' \
-                    '4. Be bullish and click on the "💸 <b> Tap 2 earn </b>" button in the main menu\n\n' \
+                    '4. Be bullish and click on the "💸 <b> 💸 Start script </b>" button in the main menu\n\n' \
                     '5. Follow the instructions you will receive from the Bot'
 
     await UserFollowing.choose_point.set()

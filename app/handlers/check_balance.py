@@ -45,12 +45,10 @@ async def check_wallet_keys(message: types.Message, state: FSMContext):
 
     reply_message = "👝 Check balance \n\n"
     wait_message = await message.answer("⏳ Getting information about wallets ...")
-    print(bridge_amount)
+
     for i, random_amount in zip(range(len(private_keys)), bridge_amount):
         es = Estimate(private_keys[i])
-
         reply_message += f"*{es.get_eth_address()}* \n\n"
-        print(random_amount)
 
         eth_balance = es.get_eth_balance()
         zora_balance = es.get_zora_balance()
@@ -92,5 +90,5 @@ async def check_wallet_keys(message: types.Message, state: FSMContext):
     await bot.delete_message(chat_id=wait_message.chat.id,
                              message_id=wait_message.message_id)
     await UserFollowing.choose_point.set()
-    await message.answer(reply_message, parse_mode=types.ParseMode.MARKDOWN,
+    await message.answer(reply_message, parse_mode=types.ParseMode.HTML,
                          reply_markup=reply_markup)
