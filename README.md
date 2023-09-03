@@ -36,7 +36,7 @@
 <br />
 
 ## Start
-Определите переменную окружения BOT_TOKEN, либо укажите в явном виде в файле `app/create_bot.py`
+Define the BOT_TOKEN environment variable, or set it explicitly in the `app/create_bot.py` file
 
 ### Start on Windows OS
 ```sh
