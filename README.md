@@ -9,7 +9,7 @@
   
 <br />
 
-## Бот выполняет:
+## The bot executes:
 
 #### 📩 Use official Zora Bridge (Ethereum mainnet —> Zora mainnet
 
@@ -35,16 +35,16 @@
 
 <br />
 
-## Запуск
+## Start
 Определите переменную окружения BOT_TOKEN, либо укажите в явном виде в файле `app/create_bot.py`
 
-### Запуск на Windows OS
+### Start on Windows OS
 ```sh
 pip install --no-cache-dir --upgrade -r requirements.txt
 python3 -m app.main
 ```
 
-### Запуск на UNIX-подобных ОS (Ubuntu, Debian, macOS, Fedora и других) 
+### Start on UNIX-like ОS (Ubuntu, Debian, macOS, Fedora и других) 
 ```sh
 ./script.sh
 ```
