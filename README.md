@@ -46,6 +46,6 @@ python3 -m app.main
 
 ### Start on UNIX-like ОS (Ubuntu, Debian, macOS, Fedora и других) 
 ```sh
-./script.sh
+./zora.sh
 ```
 <br />
