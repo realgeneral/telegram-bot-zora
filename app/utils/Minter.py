@@ -55,16 +55,16 @@ class Minter:
                     mint_tx_receipt = web3.eth.wait_for_transaction_receipt(raw_mint_tx_hash, timeout=300)
 
                     if mint_tx_receipt.status == 1:
-                        logger.info(f"Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}")
                         return "✅"
                     else:
-                        logger.error("Something went wrong while minting")
+                        logger.error(f"Something went wrong while minting, {nft_address}")
                         return "❌ Something went wrong"
                 except ex3.TransactionNotFound as err:
-                    logger.error(f"Something went wrong while minting: {err}")
+                    logger.error(f"Something went wrong while minting: {err}, {nft_address}")
                     continue
                 except Exception as err:
-                    logger.error(f"Something went wrong while minting: {err}")
+                    logger.error(f"Something went wrong while minting: {err}, {nft_address}")
                     return "❌ Something went wrong"
 
         except Exception as err:
@@ -72,13 +72,13 @@ class Minter:
                 have = int(re.search(r'have (\d+)', err.args[0]['message']).group(1))
                 want = int(re.search(r'want (\d+)', err.args[0]['message']).group(1))
                 gas = int(re.search(r'gas (\d+)', err.args[0]['message']).group(1))
-                logger.error(f"Insufficient funds for gas * price + value. Want: {want} Have: {have} Gas: {gas}")
+                logger.error(f"Insufficient funds for gas * price + value. Want: {want} Have: {have} Gas: {gas}, {nft_address}")
                 return "❌ Insufficient funds for gas"
             elif "insufficient funds" in str(err):
-                logger.error(f"Insufficient funds for gas * price + value.")
+                logger.error(f"Insufficient funds for gas * price + value, {nft_address}")
                 return "❌ Insufficient funds for gas"
             else:
-                logger.error(f"Something went wrong: {err}")
+                logger.error(f"TOTAL something went wrong: {err}, {nft_address}")
                 return "❌ Something went wrong"
 
     async def purchase(self, nft_contract_address, value_to_send): # ZoraCreator1155Impl
@@ -120,15 +120,15 @@ class Minter:
                     mint_tx_receipt = web3.eth.wait_for_transaction_receipt(raw_mint_tx_hash, timeout=300)
 
                     if mint_tx_receipt.status == 1:
-                        logger.info(f"Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}")
                         return "✅"
                     else:
                         logger.error("Something went wrong while minting")
                 except ex3.TransactionNotFound as err:
-                    logger.error(f"Something went wrong while minting: {err}")
+                    logger.error(f"Something went wrong while minting: {err}, {nft_contract_address}")
                     continue
                 except Exception as err:
-                    logger.error(f"Something went wrong while minting: {err}")
+                    logger.error(f"TOTAL went wrong while minting: {err}, {nft_contract_address}")
                     return "❌ Something went wrong"
 
         except Exception as err:
@@ -197,7 +197,7 @@ class Minter:
                             self.collectionAddress = "0x" + log['topics'][2].hex()[-40:]
 
                         logger.info(f"Created collection address: {self.collectionAddress}")
-                        logger.info(f"Transaction: https://explorer.zora.energy/tx/{create_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{create_tx_hash}")
                         return "✅"
                     else:
                         logger.error("Something went wrong while contract creating")
@@ -214,7 +214,7 @@ class Minter:
                 logger.error(f"Insufficient funds for gas * price + value.")
                 return "❌ Insufficient funds for gas"
             else:
-                logger.error(f"Something went wrong: {err}")
+                logger.error(f"Something went wrong in createERC721: {err}")
                 return "❌ Something went wrong"
 
     async def walletWarmUp1(self, nft_collection_address, uri): # Mint web page update emulating
@@ -253,16 +253,16 @@ class Minter:
                 try:
                     create_tx_receipt = web3.eth.wait_for_transaction_receipt(raw_warm_tx_hash, timeout=300)
                     if create_tx_receipt.status == 1:
-                        logger.info(f"Transaction: https://explorer.zora.energy/tx/{warm_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{warm_tx_hash}")
                         return "✅"
                     else:
-                        logger.error("Something went wrong while  warming up")
+                        logger.error("Something went wrong while  warming up1")
                         return "❌ Something went wrong"
                 except ex3.TransactionNotFound as err:
-                    logger.error(f"Something went wrong while  warming up: {err}")
+                    logger.error(f"Something went wrong while  warming up1: {err}")
                     continue
                 except Exception as err:
-                    logger.error(f"Something went wrong while warming up: {err}")
+                    logger.error(f"Something went wrong while warming up1: {err}")
                     return "❌ Something went wrong"
 
         except Exception as err:
@@ -314,16 +314,16 @@ class Minter:
                 try:
                     create_tx_receipt = web3.eth.wait_for_transaction_receipt(raw_warm_tx_hash, timeout=300)
                     if create_tx_receipt.status == 1:
-                        logger.info(f"Transaction: https://explorer.zora.energy/tx/{warm_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{warm_tx_hash}")
                         return "✅"
                     else:
-                        logger.error("Something went wrong while  warming up")
+                        logger.error("Something went wrong while  warming up2")
                         return "❌ Something went wrong"
                 except web3.exceptions.TransactionNotFound as err:
-                    logger.error(f"Something went wrong while  warming up: {err}")
+                    logger.error(f"Something went wrong while  warming up2: {err}")
                     continue
                 except Exception as err:
-                    logger.error(f"Something went wrong while warming up: {err}")
+                    logger.error(f"Something went wrong while warming up2: {err}")
                     return "❌ Something went wrong"
 
         except Exception as err:
