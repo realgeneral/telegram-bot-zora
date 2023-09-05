@@ -73,8 +73,12 @@ async def get_today_logs(message: types.Message):
 
     with open("logs/logs.log", 'r') as f:
         for line in f:
-            if line.startswith(today):
+            if today in line:
                 today_logs.append(line.strip())
 
     reply_message = "\n".join(today_logs)
+
+    if reply_message == "":
+        reply_message = "Today no logs"
+
     await message.answer(reply_message[-4000:])
