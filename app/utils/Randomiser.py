@@ -25,32 +25,32 @@ class Randomiser:
 
     @staticmethod
     def random_bridge():
-        return random.randint(90, 180)
+        return random.randint(45, 90)
 
     @staticmethod
     def random_bridge_after():
-        return random.randint(40, 65)
+        return random.randint(20, 33)
 
     @staticmethod
     def random_contract():
-        return random.randint(240, 300)
+        return random.randint(120, 150)
 
     @staticmethod
     def random_contract_after():
-        return random.randint(600, 900)
+        return random.randint(300, 450)
 
     @staticmethod
     def random_warm_up():
-        return random.randint(240, 300)
+        return random.randint(120, 150)
 
     @staticmethod
     def random_warm_up_after():
-        return random.randint(1800, 2250)
+        return random.randint(900, 1125)
 
     @staticmethod
     def random_mint():
-        return random.randint(240, 300)
+        return random.randint(120, 160)
 
     @staticmethod
     def random_mint_after():
-        return random.randint(900, 1350)
+        return random.randint(450, 675)
