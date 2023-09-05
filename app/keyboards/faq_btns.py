@@ -1,6 +1,6 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-b1 = KeyboardButton("🗺 How to get started?")
+b1 = KeyboardButton("🗺 How to start?")
 b2 = KeyboardButton("🧐 What can bot do?")
 b3 = KeyboardButton("⛽️ What is GWEI ?")
 b4 = KeyboardButton("💎 Premium version")
