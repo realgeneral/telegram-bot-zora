@@ -10,9 +10,10 @@ from app.states import UserFollowing
 from app.keyboards import faq_buttons
 
 
-@dp.message_handler(Text(equals=["ℹ️ FAQ"]), state=UserFollowing.choose_point)
+@dp.message_handler(Text(equals=["ℹ️ FAQ"]), state='*')
 async def faq_handler(message: types.Message):
-    reply_message = "ℹ️ FAQ"
+    reply_message = "ℹ️ FAQ \n\n" \
+                    "Choose your question and hit that button on the menu below!"
 
     await UserFollowing.choose_point.set()
     await message.answer(reply_message, parse_mode=types.ParseMode.MARKDOWN,
@@ -52,7 +53,7 @@ async def what_can_bot_do(message: types.Message):
 async def premium_version(message: types.Message):
     reply_message = "<b>Premium version</b>\n\n" \
                     "To set-up more wallets in the bot, you need to become a premium memeber.  \n\n" \
-                    "<i>- The ability to load up to 50 wallets into the bot </i>\n" \
+                    "<i>- The ability to load up to 10 wallets into the bot </i>\n" \
                     "<i>- Be among the first to get access to our latest developments</i>\n"\
                     "<i>- Your tasks bot will perform in high priority </i>\n" \
                     "<i>- You will give us the motivation to make the software even better for you</i>\n\n" \
@@ -63,16 +64,17 @@ async def premium_version(message: types.Message):
                          reply_markup=faq_buttons)
 
 
-@dp.message_handler(Text(equals=["🗺 How to get started?"]), state=UserFollowing.choose_point)
+@dp.message_handler(Text(equals=["🗺 How to start?"]), state=UserFollowing.choose_point)
 async def premium_version(message: types.Message):
-    reply_message = "<b> How the hell do I get started? </b>\n\n" \
-                    '1. Upload your private keys in the "➕ <b> New keys </b>" tab\n' \
-                    ' <a href="https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key">How to get private keys from the wallet guide</a> )\n\n' \
-                    '2. Click on the "👝 <b> Check Balance </b>" button. Based on the GWEI values, we will select the exact deposit amount to make all Zora activities.\n\n' \
-                    '3. Send the quoted ETH from your CEX to your wallet in Ethereum Mainnet Chain\n ' \
-                    '( ❗️be sure to send it with <b> CEX </b> )\n\n' \
-                    '4. Be bullish and click on the "💸 <b> 💸 Start script </b>" button in the main menu\n\n' \
-                    '5. Follow the instructions you will receive from the Bot'
+    reply_message = "<b> How to start? </b>\n\n" \
+                    '1. Load-up your private keys by pressing <b>«➕ Load new wallets»</b> button in the menu.\n' \
+                    '  [<a href="https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key">guide</a>]\n\n' \
+                    '<b>Example:</b>\n' \
+                    '<i>a692b7245354c12ca7ef7138bfdc040abc7d07612c9f3770c9be81d9459911ca</i>\n' \
+                    '<i>8cd22cacf476cd9ffebbbe05877c9cab695c6abafcad010a0194dbb1cb6e66f1</i>\n' \
+                    '<i>0b77a1a6618f75360f318e859a89ba8008b8d0ceb10294418443dc8fd643e6bb</i>\n\n' \
+                    '2. Withdraw the required amount of ETH in <b>Ethereum Mainnet Chain</b> to your wallet using CEX (<b>Binance, OKX,</b> etc).\n\n' \
+                    '3. After that go to the main menu and press <b>«💸 Start script» </b> button.' \
 
     await UserFollowing.choose_point.set()
     await message.answer(reply_message, parse_mode=types.ParseMode.HTML,
