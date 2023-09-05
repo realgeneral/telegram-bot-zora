@@ -16,22 +16,24 @@ NOTSUB_MESSAGE = "Looks like you're not subscribed yet! 🙁 Subscribe now to ac
 
 @dp.message_handler(commands=['start'])
 async def start_cmd(message: types.Message):
-    buttons = [
-        KeyboardButton(text="🤿 Alright, let's dive in!"),
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard=[buttons], resize_keyboard=True)
+    if int(message.from_user.id) in admin.list_of_prem_users:
+        max_count = 15
+    else:
+        max_count = 5
 
     await UserFollowing.check_subscribe.set()
-    await message.answer(f"Hey there, <b> {message.from_user.first_name} </b>, right place, right time! \n \n"
-                         "Our Zora Bot benefits:\n \n"
-                         "  • 🌐 Open source \n \n"
-                         "  • 🆓 It's free \n \n"
-                         "  • 😃 User-friendly \n \n"
-                         "  • 🕔 Save your time \n \n"
-                         "  • 💼 Do all important tasks  \n \n"
-                         "  • 🔒 Has Anti-Sybil mode \n",
-                         parse_mode=types.ParseMode.HTML,
-                         reply_markup=reply_markup)
+    await message.answer(f"Welcome, <b> {message.from_user.first_name}</b>! \n\n"
+                         f"The total amount of wallets you can run Zora bot: <b>{max_count}</b>\n\n"
+                         "<b>⬇️ Load-up your private keys below </b>"
+                         "[<a href='https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key'>"
+                         "<b>guide</b></a>]\n\n"
+                         "<b>Example:</b>\n"
+                         "<i>a692b7245354c12ca7ef7138bfdc040abc7d07612c9f3770c9be81d9459911ca</i>\n"
+                         "<i>8cd22cacf476cd9ffebbbe05877c9cab695c6abafcad010a0194dbb1cb6e66f1</i>\n"
+                         "<i>0b77a1a6618f75360f318e859a89ba8008b8d0ceb10294418443dc8fd643e6bb</i>\n\n"
+                         "<b> ⚠️Please note: We do not store your data. The bot uses one-time sessions.</b>\n\n"
+                         "[<a href='https://t.me/whatheshark'>Our GitHub</a>]",
+                         parse_mode=types.ParseMode.HTML, reply_markup=ReplyKeyboardRemove())
 
 
 def check_sub_channel(chat_member):
@@ -40,41 +42,33 @@ def check_sub_channel(chat_member):
     return False
 
 
-@dp.message_handler(Text(equals="🤿 Alright, let's dive in!"), state=UserFollowing.check_subscribe)
-async def check_subscribe(message: types.Message):
-    await UserFollowing.check_subscribe.set()
-    await message.answer(
-        "👋📢 Whoa, hold up! Haven't joined our <a href='https://t.me/trioinweb3'>channel</a> yet? \n\n"
-        "We're dropping <b> crypto wisdom </b> and sharing our <b> know-how </b>. \n"
-        "Your sub supports us to make <b> new retro-bots </b> for You! \n \n"
-        "Hit that sub button below ⬇️, then <b> hit us back </b> with  <b> 'Done'</b>! ",
-        parse_mode=types.ParseMode.HTML,
-        reply_markup=check_sub_menu)
+@dp.message_handler(state=UserFollowing.check_subscribe)
+async def check_subscribe(message: types.Message, state: FSMContext):
+    if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=message.from_user.id)):
+        await UserFollowing.get_private_keys.set()
+        await private_keys(message, state)
+    else:
+        await state.update_data(message=message)
+        await UserFollowing.check_subscribe.set()
+        await message.answer(
+            "👋📢 Haven't joined our <a href='https://t.me/EBSH_WEB3'>channel</a> yet? \n\n"
+            "We're dropping <b> crypto wisdom </b> and sharing our <b> know-how </b>. \n"
+            "Your sub supports us to make <b> new retro-bots </b> for You! \n \n"
+            "Hit that sub button below ⬇️, then <b> hit us back </b> with  <b> 'Done'</b>! ",
+            parse_mode=types.ParseMode.HTML,
+            reply_markup=check_sub_menu)
 
 
 @dp.callback_query_handler(text="is_subscribe", state=UserFollowing.check_subscribe)
-async def is_subscribe(callback_query: types.CallbackQuery):
+async def is_subscribe(callback_query: types.CallbackQuery, state: FSMContext):
     await bot.delete_message(chat_id=callback_query.message.chat.id, message_id=callback_query.message.message_id)
     if check_sub_channel(await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=callback_query.from_user.id)):
+        data = await state.get_data()
+        message = data.get("message")
+
         await UserFollowing.get_private_keys.set()
-        await bot.send_message(callback_query.from_user.id, "<b> Load-up your private keys below ⬇️ </b>\n\n"
-                                                            "<b>One line one wallet (press shift+enter to switch to "
-                                                            "a new line)</b> \n\n"
-                                                            "<a href='https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key'>"
-                                                            "<b>How to get private keys from the wallet guide</b></a>\n\n"
-                                                            "<b>Example:</b>\n"
-                                                            "0x0430000000000000000000000000000 \n"
-                                                            "0x4349593453490203003050435043534 \n\n"
-                                                            "<i><b> Free version</b></i>: up to 10 keys.\n"
-                                                            "<i><b> Premium version</b></i>: up to 50 keys. \n"
-                                                            "<i> For access to the premium version, please "
-                                                            "<a href='https://t.me/whatheshark'>contact us</a> </i> \n\n"
-                                                            "<i><u>The bot doesn't collect or store your personal data or"
-                                                            "private keys. Zora bot — fully open source project.</u> \n\n "
-                                                            "GitHub: https://github.com/zemetsskiy/ZoraAutomatization "
-                                                            "</i>",
-                               parse_mode=types.ParseMode.HTML,
-                               reply_markup=ReplyKeyboardRemove())
+        await private_keys(message, state)
+
     else:
         await bot.send_message(callback_query.from_user.id, NOTSUB_MESSAGE, reply_markup=check_sub_menu)
 
@@ -134,18 +128,19 @@ async def private_keys(message: types.Message, state: FSMContext):
         is_ready_to_start = 1
     else:
         is_ready_to_start = 0
-        message_response += f"\nNow deposit require ETH amount in <b>Ethereum Mainnet, using your CEX!</b> * (Withdrawal " \
-                            f"takes ~ 5 minutes)\n\n "
+        message_response += f"\nPlease, deposit ETH amount on your wallet in <b>Ethereum Mainnet Chain</b> \n\n" \
+                            f"* <i>Withdrawal takes ~ 5 minutes</i>\n\n "
 
-    await state.update_data(is_ready_to_start=is_ready_to_start)
+    await state.update_data(is_ready_to_start=1)
 
-    message_response += "\n<i><u> * Be sure to use CEX or you'll link your wallets and become sybil 💀</u></i>"
+    message_response += "<b>⚠️ Be sure to use CEX or you'll link your wallets and become sybil</b>"
 
     await bot.delete_message(chat_id=wait_message.chat.id,
                              message_id=wait_message.message_id)
 
     buttons = [
         KeyboardButton(text="⬅ Go to menu"),
+        KeyboardButton(text="ℹ️ FAQ"),
     ]
 
     reply_markup = ReplyKeyboardMarkup(keyboard=[buttons],
