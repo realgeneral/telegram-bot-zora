@@ -187,7 +187,7 @@ async def mint_6(minter):
 
 
 async def mint_7(minter):
-    return await minter.mint("0x04c106d8c726481b0a0bb97c802b98c9dae72bfb", 2)
+    return await minter.purchase("0x02a1c9babc92d600818ea11ba5b9547f7f25887c", value_to_send=0.000777)
 
 
 async def mint_8(minter):
