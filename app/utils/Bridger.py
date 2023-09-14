@@ -1,6 +1,8 @@
 import asyncio
 import random
 import re
+
+import httpx
 import web3.exceptions as ex3
 
 from web3 import Web3
@@ -108,3 +110,31 @@ class Bridger:
         logger.info(f"Random amount: {formatted_number}")
 
         return formatted_number
+
+
+    @staticmethod
+    async def get_transactions(address):
+        API_KEY = "J3C3KSIT2V7TVVQJ7AKF23G2DR3UANACBZ"
+        try:
+            url = f"https://api.etherscan.io/api?module=account&action=txlist&address={address}&startblock=0&endblock=99999999&sort=asc&apikey={API_KEY}"
+
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url)
+                response.raise_for_status()
+                data = response.json()
+
+            await asyncio.sleep(2)
+            return data.get('result', [])
+
+        except httpx.RequestError as e:
+            logger.error(f"Request error while getting list of txs: {e}")
+            return []
+
+    @staticmethod
+    async def used_bridge(address):
+        bridge_address = "0x1a0ad011913A150f69f6A19DF447A0CfD9551054"
+        transactions = await Bridger.get_transactions(address)
+        for tx in transactions:
+            if tx['to'].lower() == bridge_address.lower():
+                return True
+        return False
