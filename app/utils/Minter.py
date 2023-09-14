@@ -16,8 +16,14 @@ class Minter:
         self.collectionAddress = ""
 
     async def mint(self, nft_address, nft_id: int):
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
+
+
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
+            'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@194.31.162.111:7627",
+                        'http': 'http://' + "pnorwyha:snmfocltb81h@194.31.162.111:7627"}}))
+
         logger.info(f"Successfully connected to {rpcs['zora']}")
+
 
         try:
             wallet_address = web3.eth.account.from_key(self.pk).address
@@ -83,7 +89,9 @@ class Minter:
 
     async def purchase(self, nft_contract_address, value_to_send): # ZoraCreator1155Impl
 
-        web3 = Web3(Web3.HTTPProvider(rpcs["zora"]))
+        web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
+            'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@194.31.162.111:7627",
+                        'http': 'http://' + "pnorwyha:snmfocltb81h@194.31.162.111:7627"}}))
 
         logger.info(f"Successfully connected to {rpcs['zora']}")
 
@@ -143,7 +151,7 @@ class Minter:
                 logger.error(f"Insufficient funds for gas * price + value.")
                 return "❌ Insufficient funds for gas"
             else:
-                logger.error(f"Something went wrong: {err}")
+                logger.error(f"Something went wrong: {err}, {nft_contract_address}")
                 return "❌ Something went wrong"
 
     async def createERC721(self, name, symbol, mintPrice, mintLimitPerAddress, editionSize, royaltyBPS, description, imageURI): # ZoraNFTCreator
