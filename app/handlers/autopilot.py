@@ -15,7 +15,7 @@ from app.utils.configs import description as desc_list
 from app.utils.Randomiser import Randomiser
 from app.utils.configs.ipfs import imageURI_list_hashes
 from app.utils.Estimate import Estimate
-
+from app.logs import logging as logger
 
 @dp.message_handler(Text(equals="💸 Start script"), state=UserFollowing.choose_point)
 async def tap_to_earn(message: types.Message, state: FSMContext):
@@ -89,17 +89,17 @@ async def tap_to_earn(message: types.Message, state: FSMContext):
         reply_message += f"🏋️‍♂ <b>Wallet warm-up's</b> ~ {average_time_of_warm_up} mins\n" \
                          f"       Sleep after all warm-up's ~ {average_time_after_warm_up} mins\n\n"
         reply_message += f"🔀 <b>Randomize mint ERC 1155 NFT'S (2)</b> ~ {average_time_of_mint_erc_1155} mins\n" \
-                         f"       • <i><a href='https://zora.co/collect/zora:0x5CA17551b686bAF0C6bd7727e153B95be9b1Ae0D'>Diagrammatics</a></i>\n"\
-                         f"       • <i><a href='https://zora.co/collect/zora:0x4c0c2dd31d2661e8bcec60a42e803dcc6f81baad'>Pattern Recognition</a></i>\n\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0x5CA17551b686bAF0C6bd7727e153B95be9b1Ae0D'>Diagrammatics</a></i>\n"\
+                         "       • <i><a href='https://zora.co/collect/zora:0x4c0c2dd31d2661e8bcec60a42e803dcc6f81baad'>Pattern Recognition</a></i>\n\n" \
 
         reply_message += f"🔀 <b>Randomize mint ERC 721 NFT'S (7)</b> ~ {average_time_of_mint_erc_721} mins\n" \
-                         f"       • <i><a href='https://zora.co/collect/zora:0x3f1201a68b513049f0f6e182f742a0dce970d8cd'>Zora Merch - Limited Edition Hoodie</a></i>\n" \
-                         f"       • <i><a href='https://zora.co/collect/zora:0x34573d139A15e5d3D129AD6AE20c3C8B221fD921'>50M LayerZero Messages</a></i>\n" \
-                         f"       • <i><a href='https://zora.co/collect/zora:0xbc8ae1adbfb0052babae00d3211f0be30f1fbd5c'>3NUM Shield Opepen</a></i>\n" \
-                         f"       • <i><a href='https://zora.co/collect/zora:0xcba60a105b5c2fdaf9dd27e733132cc4f7ac9a66'>Holograph VIP</a></i>\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0x3f1201a68b513049f0f6e182f742a0dce970d8cd'>Zora Merch - Limited Edition Hoodie</a></i>\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0x34573d139A15e5d3D129AD6AE20c3C8B221fD921'>50M LayerZero Messages</a></i>\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0xbc8ae1adbfb0052babae00d3211f0be30f1fbd5c'>3NUM Shield Opepen</a></i>\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0xcba60a105b5c2fdaf9dd27e733132cc4f7ac9a66'>Holograph VIP</a></i>\n" \
                          f"       • <i><a href='https://zora.co/collect/zora:0xd4889d519b1ab9b2fa8634e0271118de480f6d32'>BLACK DAVE - Meet the TOPIANS</a></i>\n"\
-                         f"       • <i><a href='https://zora.co/collect/zora:0xcdc9c8060c7c357ee25cd80455cbe05b226d291f'>WEB3PLOTMANS</a></i>\n" \
-                         f"       • <i><a href='https://zora.co/collect/zora:0x706bafabdd00ceac5b66600901a2b1d1f4992b9d'>Polyhedra live on Mantle Network Mainnet</a></i>\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0xcdc9c8060c7c357ee25cd80455cbe05b226d291f'>WEB3PLOTMANS</a></i>\n" \
+                         "       • <i><a href='https://zora.co/collect/zora:0x706bafabdd00ceac5b66600901a2b1d1f4992b9d'>Polyhedra live on Mantle Network Mainnet</a></i>\n" \
                          f"  Sleep after all mints ~ {average_time_after_mints} mins\n\n"
 
         reply_message += f"🕔 <b>Total time</b> ~ {total_time} hours *\n\n" \
@@ -220,6 +220,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         minters_obj = [Minter(private_key) for private_key in private_keys]
 
         ########################################### BRIDGE  ###########################################
+
         user_data = await state.get_data()
         if user_data.get("stop_flag"):
             return
@@ -255,7 +256,7 @@ async def start_earn(message: types.Message, state: FSMContext):
 
         await state.update_data(final_statistic=final_statistic)
 
-        ##############################################################################################
+        #############################################################################################
 
         sleep_on_0 = Randomiser.random_bridge_after()
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -267,7 +268,8 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        ########################################### CONTRACT  ###########################################
+        ########################################## CONTRACT  ###########################################
+
         random_names = list(animals.animals.keys())
         random_symbols = list(animals.animals.values())
         random_desc = list(desc_list.description)
@@ -321,7 +323,9 @@ async def start_earn(message: types.Message, state: FSMContext):
             wait_message_text += f"Wallet {i + 1}: {list_of_contract_result[i]} \n"
 
         await state.update_data(final_statistic=final_statistic)
-        ##############################################################################################
+
+        #############################################################################################
+
         user_data = await state.get_data()
         if user_data.get("stop_flag"):
             return
@@ -335,7 +339,8 @@ async def start_earn(message: types.Message, state: FSMContext):
         user_data = await state.get_data()
         if user_data.get("stop_flag"):
             return
-        ########################################### WARM UP  ###########################################
+
+        ########################################## WARM UP  ###########################################
 
         warm_up_statistic = "📊 Statistic \n\n" \
                             " Warm Up #1 \n"
@@ -440,7 +445,7 @@ async def start_earn(message: types.Message, state: FSMContext):
         if user_data.get("stop_flag"):
             return
 
-        ##############################################################################################
+        #############################################################################################
 
         sleep_on_warm_up_3 = Randomiser.random_warm_up_after()
         await bot.edit_message_text(chat_id=wait_message.chat.id,
@@ -846,6 +851,8 @@ async def start_earn(message: types.Message, state: FSMContext):
             used_functions_by_minters[minter].append(mints_func[8])
 
             mint_9_result = await mints_func[8](minter)
+
+            logger.info(f"🔉 List used_functions_by_minters: {used_functions_by_minters[minter]}")
 
             if mint_9_result is None:
                 mint_9_result = "❌ Something went wrong"
