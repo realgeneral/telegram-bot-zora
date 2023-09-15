@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import types
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.dispatcher.filters import Text
@@ -86,10 +88,10 @@ async def private_keys(message: types.Message, state: FSMContext):
 
     if int(message.from_user.id) in admin.list_of_prem_users:
         private_keys = private_keys[:50]
-        max_count = 50
+        max_count = 15
     else:
         private_keys = private_keys[:10]
-        max_count = 10
+        max_count = 5
 
     for _ in private_keys:
         random_amount.append(Bridger.choose_random_amount(0.009501, 0.01003))
@@ -105,20 +107,26 @@ async def private_keys(message: types.Message, state: FSMContext):
     count_ok_wallet = 0
 
     for i, random in zip(range(len(private_keys)), random_amount):
-
         es = Estimate(private_keys[i])
         eth_balance = es.get_eth_balance()
-        eth_required = es.eth_required(random)
 
-        message_response += f"{i + 1}. <b>{es.get_eth_address()}</b> \n"
-        message_response += f"({eth_balance} ETH / {eth_required} ETH required)"
+        message_response += f"{i + 1}. <b>{es.get_eth_address()}</b> "
 
-        if eth_balance != "-":
-            if eth_balance >= eth_required:
-                message_response += " ✅\n"
-                count_ok_wallet += 1
-            else:
-                message_response += " ❌\n"
+        await asyncio.sleep(1)
+        is_used_bridge = await Bridger.used_bridge(private_keys[i])
+        if is_used_bridge:
+            message_response += f"<b>[BRIDGED]</b> (Balance in Zora: {eth_balance} ETH) ✅\n"
+            count_ok_wallet += 1
+        else:
+            eth_required = es.eth_required(random)
+            message_response += f"\n({eth_balance} ETH / {eth_required} ETH required)"
+
+            if eth_balance != "-":
+                if eth_balance >= eth_required:
+                    message_response += " ✅\n"
+                    count_ok_wallet += 1
+                else:
+                    message_response += " ❌\n"
 
         await bot.edit_message_text(chat_id=wait_message.chat.id,
                                     message_id=wait_message.message_id,
@@ -130,11 +138,9 @@ async def private_keys(message: types.Message, state: FSMContext):
         is_ready_to_start = 0
         message_response += f"\nPlease, deposit ETH amount on your wallet in <b>Ethereum Mainnet Chain</b> \n\n" \
                             f"* <i>Withdrawal takes ~ 5 minutes</i>\n\n "
+        message_response += "<b>⚠️ Be sure to use CEX or you'll link your wallets and become sybil</b>"
 
-    await state.update_data(is_ready_to_start=1)
-
-    message_response += "<b>⚠️ Be sure to use CEX or you'll link your wallets and become sybil</b>"
-
+    await state.update_data(is_ready_to_start=is_ready_to_start)
     await bot.delete_message(chat_id=wait_message.chat.id,
                              message_id=wait_message.message_id)
 
