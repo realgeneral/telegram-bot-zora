@@ -15,7 +15,6 @@ async def go_menu(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
 
     if current_state == UserFollowing.tap_to_earn.state:
-        print(state)
         await state.update_data(stop_flag=True)
 
     data = await state.get_data()
