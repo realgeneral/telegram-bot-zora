@@ -17,7 +17,6 @@ class Minter:
 
     async def mint(self, nft_address, nft_id: int):
 
-
         web3 = Web3(Web3.HTTPProvider(rpcs["zora"], request_kwargs={
             'proxies': {'https': 'http://' + "pnorwyha:snmfocltb81h@194.31.162.111:7627",
                         'http': 'http://' + "pnorwyha:snmfocltb81h@194.31.162.111:7627"}}))
@@ -61,16 +60,16 @@ class Minter:
                     mint_tx_receipt = web3.eth.wait_for_transaction_receipt(raw_mint_tx_hash, timeout=300)
 
                     if mint_tx_receipt.status == 1:
-                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}, {nft_address}")
                         return "✅"
                     else:
-                        logger.error(f"Something went wrong while minting, {nft_address}")
+                        logger.error(f"⛔ Something went wrong while minting, {nft_address}")
                         return "❌ Something went wrong"
                 except ex3.TransactionNotFound as err:
-                    logger.error(f"Something went wrong while minting: {err}, {nft_address}")
+                    logger.error(f"⛔ Something went wrong while minting: {err}, {nft_address}")
                     continue
                 except Exception as err:
-                    logger.error(f"Something went wrong while minting: {err}, {nft_address}")
+                    logger.error(f"⛔ Something went wrong while minting: {err}, {nft_address}")
                     return "❌ Something went wrong"
 
         except Exception as err:
@@ -128,16 +127,16 @@ class Minter:
                     mint_tx_receipt = web3.eth.wait_for_transaction_receipt(raw_mint_tx_hash, timeout=300)
 
                     if mint_tx_receipt.status == 1:
-                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}")
+                        logger.info(f"✅ Transaction: https://explorer.zora.energy/tx/{mint_tx_hash}, {nft_contract_address}")
                         return "✅"
                     else:
-                        logger.error("Something went wrong while minting")
+                        logger.error(f"⛔ Something went wrong while minting, {nft_contract_address}")
                 except ex3.TransactionNotFound as err:
-                    logger.error(f"Something went wrong while minting: {err}, {nft_contract_address}")
+                    logger.error(f"⛔ Something went wrong while minting: {err}, {nft_contract_address}")
                     continue
                 except Exception as err:
-                    logger.error(f"TOTAL went wrong while minting: {err}, {nft_contract_address}")
-                    return "❌ Something went wrong"
+                    logger.error(f"⛔ TOTAL went wrong while minting: {err}, {nft_contract_address}")
+                    return "❌ Something went wrong "
 
         except Exception as err:
             if "insufficient funds" and "have" in str(err):
