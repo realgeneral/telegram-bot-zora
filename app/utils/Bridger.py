@@ -17,10 +17,9 @@ class Bridger:
         self.pk = pk
 
     async def eth_zora_bridge(self, bridge_amount):
-        web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
-        logger.info(f"Successfully connected to {rpcs['eth']}")
-
         try:
+            web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+            logger.info(f"Successfully connected to {rpcs['eth']}")
             wallet_address = web3.eth.account.from_key(self.pk).address
             wallet_balance = web3.eth.get_balance(wallet_address)
 
@@ -131,10 +130,17 @@ class Bridger:
             return []
 
     @staticmethod
-    async def used_bridge(address):
+    async def used_bridge(private_key):
         bridge_address = "0x1a0ad011913A150f69f6A19DF447A0CfD9551054"
-        transactions = await Bridger.get_transactions(address)
-        for tx in transactions:
-            if tx['to'].lower() == bridge_address.lower():
-                return True
-        return False
+        try:
+            web3 = Web3(Web3.HTTPProvider(rpcs["eth"]))
+            wallet_address = web3.eth.account.from_key(private_key).address
+
+            transactions = await Bridger.get_transactions(wallet_address)
+            for tx in transactions:
+                if tx['to'].lower() == bridge_address.lower():
+                    return True
+            return False
+        except Exception as err_:
+            logger.info(f"Failed to get trx for bridge check: {err_}")
+            return False
